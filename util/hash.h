@@ -1,0 +1,8 @@
+//
+// Created by Peter Sun on 11/18/20.
+//
+
+#ifndef SEARCH_ENGINE_PETER_SUN_HASH_H
+#define SEARCH_ENGINE_PETER_SUN_HASH_H
+
+#endif //SEARCH_ENGINE_PETER_SUN_HASH_H
