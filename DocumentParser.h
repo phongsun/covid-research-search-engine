@@ -8,13 +8,25 @@
 #include <iostream>
 #include <filesystem>
 #include <dirent.h>
+#include <unordered_set>
+#include <iostream>
 #include "simdjson.h"
+#include "ArticleData.h"
+#include "porter2_stemmer.h"
+#include "DSAvlTree.h"
+#include "IndexNodeData.h"
 
 using namespace std;
 
 class DocumentParser {
 public:
-    void parse(const string &path);
+    DocumentParser(const string &corpusPath, const string &stopwordPath);
+    void parse(DSAvlTree<IndexNodeData> &keywordIndex);
+    unordered_set<string> loadStopWords(const string &filePath);
+    inline void addArticleToKeywordIndex(DSAvlTree<IndexNodeData> &avlTree, const ArticleData &articleData);
+private:
+    string corpusPath;
+    string stopwordPath;
 };
 
 

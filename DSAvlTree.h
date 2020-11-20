@@ -21,6 +21,10 @@ public:
         return search(data, this->root);
     }
 
+    int count() {
+        return count(root);
+    }
+
 private:
     DSAvlNode<T> *root;
 
@@ -30,6 +34,7 @@ private:
     void doubleWithRightChild(DSAvlNode<T>* &k3);
     void doubleWithLeftChild(DSAvlNode<T>* &k3);
     DSAvlNode<T> *search(T data, DSAvlNode<T> * &c);
+    int count(DSAvlNode<T> * &t);
 
     void preOrder(DSAvlNode<T> *c) {
         if (c!= nullptr) {
@@ -142,5 +147,18 @@ template<typename T>
 void DSAvlTree<T>::doubleWithRightChild(DSAvlNode<T>* &k1) {
     rotateWithLeftChild(k1->right);
     rotateWithRightChild(k1);
+}
+
+template<typename T>
+int DSAvlTree<T>::count(DSAvlNode<T>* &c) {
+    int counter = 0;
+    if (c!= nullptr) {
+        counter++;
+        counter += count(c->left);
+        counter += count(c->right);
+        return counter;
+    } else {
+        return 0;
+    }
 }
 #endif //SEARCHENGINE_DSAVLTREE_H
