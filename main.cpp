@@ -8,14 +8,18 @@
 
 using namespace std;
 
-int main() {
+int main(int argc, char** argv) {
+    string corpusDir = argv[1];
+    string searchPhrase = argv[2];
+    transform (searchPhrase.begin(), searchPhrase.end(), searchPhrase.begin(), ::tolower);
+
     DSAvlTree<IndexNodeData> invertedIndexTree;
 
     //Catch::Session().run();
-    DocumentParser documentParser = DocumentParser("../corpus", "../stop_words.txt");
+    DocumentParser documentParser = DocumentParser(corpusDir, "./stop_words.txt");
     documentParser.parse(invertedIndexTree);
     IndexNodeData searchQuery;
-    searchQuery.keyWord = "covid";
+    searchQuery.keyWord = searchPhrase;
     DSAvlNode<IndexNodeData> *node = invertedIndexTree.search(searchQuery);
     cout << "Tree count: " << invertedIndexTree.count() << endl;
     if(node == nullptr){
