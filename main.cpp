@@ -21,13 +21,12 @@ int main(int argc, char** argv) {
     IndexNodeData searchQuery;
     searchQuery.keyWord = searchPhrase;
     DSAvlNode<IndexNodeData> *node = invertedIndexTree.search(searchQuery);
-    cout << "Tree count: " << invertedIndexTree.count() << endl;
+    cout << "Number of keywords in the AvlTree index: " << invertedIndexTree.count() << endl;
     if(node == nullptr){
         cout << "Not found" << endl;
     }else{
         for(auto titleAndFreq : node->element.invertedFreq){
-            cout << "Prints out" << endl;
-            cout << titleAndFreq.second << " || " << titleAndFreq.first << endl;
+            cout <<  "The word \"" << searchPhrase << "\" appears " << titleAndFreq.second << " times in \"" << titleAndFreq.first << "\"" <<endl;
         }
     }
 

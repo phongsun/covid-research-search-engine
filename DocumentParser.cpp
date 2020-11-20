@@ -89,7 +89,7 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
             return;
         }
     }
-    cout << "number of files: " << i << endl;
+    cout << "number of files parsed: " << i << endl;
     closedir(dir);
 
 }

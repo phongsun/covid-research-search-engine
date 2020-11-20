@@ -3,9 +3,10 @@ project(search-engine-peter-sun)
 set (EXE_NAME search_engine)
 
 set (input01 "stop_words.txt")
+set (input02 "test_article.json")
 
 # Copy data files to build dir
-foreach(file IN LISTS input01)
+foreach(file IN LISTS input01 input02)
     configure_file(${file} ${file} COPYONLY)
 endforeach()
 
