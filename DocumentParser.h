@@ -6,10 +6,9 @@
 #define SEARCH_ENGINE_PETER_SUN_DOCUMENTPARSER_H
 #include <string>
 #include <iostream>
-#include <filesystem>
-#include <dirent.h>
 #include <unordered_set>
-#include <iostream>
+#include <dirent.h>
+#include <fstream>
 #include "simdjson.h"
 #include "ArticleData.h"
 #include "porter2_stemmer.h"

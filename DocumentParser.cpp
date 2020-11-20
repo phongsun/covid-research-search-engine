@@ -2,8 +2,7 @@
 // Created by Peter Sun on 11/14/20.
 //
 
-#include <dirent.h>
-#include <fstream>
+
 #include "DocumentParser.h"
 
 DocumentParser::DocumentParser(const string &corpusPath, const string &stopwordPath){
