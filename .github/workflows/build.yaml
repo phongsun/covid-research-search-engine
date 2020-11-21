@@ -3,7 +3,7 @@ name: search-engine-peter-sun
 on: [push]
 
 env:
-  EXE_NAME: search_engine
+  EXE_NAME: search_engine_peter_sun
   ### ***** Students!  Put the name of the input files and output files here.
   ###   List them in the order that they need to appear in Argv param of main.
   ###   Output Files will follow input files

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 project(search-engine-peter-sun)
-set (EXE_NAME search_engine)
+set (EXE_NAME search_engine_peter_sun)
 
 set (input01 "stop_words.txt")
 set (input02 "test_article.json")
