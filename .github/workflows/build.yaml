@@ -58,7 +58,7 @@ jobs:
       - name: Run the project
         working-directory: ${{runner.workspace}}/build
         shell: bash
-        run: ./$EXE_NAME ./ Vaccine
+        run: ./$EXE_NAME Vaccine ./
 
       #- name: Copy output files to artifact directory
       #  working-directory: ${{runner.workspace}}/build

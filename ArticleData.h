@@ -14,9 +14,9 @@ using namespace std;
 
 class ArticleData {
 public:
-    ArticleData(string title);
+    ArticleData(string documentID);
 
-    string title;
+    string documentID;
     set<string> authorLastNames;
 
     map<std::string, size_t> keyWordList;

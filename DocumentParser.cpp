@@ -13,6 +13,7 @@ DocumentParser::DocumentParser(const string &corpusPath, const string &stopwordP
 void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
     int i = 0;
     int k = 0;
+    unordered_map<string, string> stemmedWordMap;
     unordered_set<string> stopWords = this->loadStopWords(this->stopwordPath);
 
     struct dirent *entry;
@@ -29,14 +30,15 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
             i++;
             simdjson::dom::element paper = parser.load(fullPath);
             string_view title = paper["metadata"]["title"].get_string();
-            // if the title has more than 2 letters then it's a valid title
+            string_view documentID = paper["paper_id"].get_string();
+            // if the documentID has more than 2 letters then it's a valid documentID
             if (title.size() >= 3) {
-                ArticleData articleData = ArticleData({title.begin(), title.end()});
+                ArticleData articleData = ArticleData({documentID.begin(), documentID.end()});
                 std::map<std::string, size_t> wordFrequency;
                 string_view lastNameView;
                 string lastName;
                 // parse author's last name
-                for(auto author : paper["metadata"]["authors"]){
+                /*for(auto author : paper["metadata"]["authors"]){
                     if (author["last"].get_string_length() > 0) {
                         lastNameView = author["last"].get_string();
                     }
@@ -47,7 +49,7 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
                     lastName = {lastNameView.begin(), lastNameView.end()};
                     transform (lastName.begin(), lastName.end(), lastName.begin(), ::tolower);
                     articleData.authorLastNames.insert(lastName);
-                }
+                }*/
 
                 // parse the body text
                 for (auto bodyText: paper["body_text"]) {
@@ -66,13 +68,20 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
                                           istream_iterator<string>{}};
                     for (auto token: tokens) {
                         // check stop word, check if length is greater than 2 or not
-                        if (token.length() > 2 && find(stopWords.begin(), stopWords.end(), token) == stopWords.end()){
-                            // trim and stem the word
-                            Porter2Stemmer::trim(token);
-                            Porter2Stemmer::stem(token);
-                            // count the frequency of each word that aren't stop words and stemmed
-                            ++wordFrequency[token];
-                            k++;
+                        if (token.length() > 2 && stopWords.count(token) == 0){
+                            if(stemmedWordMap.count(token) > 0){ // if the token has already been stemmed before, then the stemmed word for the token is obtained and the frequency is increased
+                                ++wordFrequency[stemmedWordMap[token]];
+                            }else{ // if the token has not been stemmed before
+                                //
+                                // trim and stem the word
+                                //Porter2Stemmer::trim(token);
+                                string oldToken = token;
+                                Porter2Stemmer::stem(token);
+                                // count the frequency of each word that aren't stop words and stemmed
+                                ++wordFrequency[token];
+                                // add the stemmed token to the stemmed word map
+                                stemmedWordMap[oldToken] = token;
+                            }
                         }
                     }
                 } // end of parsing body text
@@ -80,7 +89,7 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
                 articleData.keyWordList = wordFrequency;
                 this->addArticleToKeywordIndex(keywordIndex, articleData);
 
-            } else { // no title should be less than 3 characters
+            } else { // no documentID should be less than 3 characters
 
             }
         } // end of creating articleData for the current article file
@@ -118,11 +127,11 @@ inline void DocumentParser::addArticleToKeywordIndex(DSAvlTree<IndexNodeData> &a
         keyWordNodeData.keyWord = keyWordAndFreq.first;
         DSAvlNode<IndexNodeData> *node = avlTree.search(keyWordNodeData);
         if(node == nullptr){ // keyword doesn't exist in the avlTree
-            keyWordNodeData.invertedFreq[articleData.title] = keyWordAndFreq.second;
+            keyWordNodeData.invertedFreq[articleData.documentID] = keyWordAndFreq.second;
             // insert the new data because the keyword wasn't in the tree yet
             avlTree.insert(keyWordNodeData);
-        }else{ // add the word frequency by the title of the article to the node; no need to insert because the node is already in the tree
-            node->element.invertedFreq[articleData.title] = keyWordAndFreq.second;
+        }else{ // add the word frequency by the documentID of the article to the node; no need to insert because the node is already in the tree
+            node->element.invertedFreq[articleData.documentID] = keyWordAndFreq.second;
         }
     }
     // insert the keywords into the avlTree

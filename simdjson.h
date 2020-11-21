@@ -3655,7 +3655,7 @@ public:
    *
    *   dom::parser parser;
    *   for (const element doc : parser.load_many(path)) {
-   *     cout << std::string(doc["title"]) << endl;
+   *     cout << std::string(doc["documentID"]) << endl;
    *   }
    *
    * The file is loaded in memory and can be safely deleted after the `parser.load_many(path)`
@@ -3693,9 +3693,9 @@ public:
    *   auto error = parser.load_many(path).get(docs);
    *   if (error) { cerr << error << endl; exit(1); }
    *   for (auto doc : docs) {
-   *     std::string_view title;
-   *     if ((error = doc["title"].get(title)) { cerr << error << endl; exit(1); }
-   *     cout << title << endl;
+   *     std::string_view documentID;
+   *     if ((error = doc["documentID"].get(documentID)) { cerr << error << endl; exit(1); }
+   *     cout << documentID << endl;
    *   }
    *
    * ### Threads
@@ -3727,7 +3727,7 @@ public:
    *
    *   dom::parser parser;
    *   for (element doc : parser.parse_many(buf, len)) {
-   *     cout << std::string(doc["title"]) << endl;
+   *     cout << std::string(doc["documentID"]) << endl;
    *   }
    *
    * No copy of the input buffer is made.
@@ -3743,7 +3743,7 @@ public:
    *   // here the string "[\"temporary data\"]" may no longer exist in memory
    *   // the parser instance may not have even accessed the input yet
    *   for (element doc : docs) {
-   *     cout << std::string(doc["title"]) << endl;
+   *     cout << std::string(doc["documentID"]) << endl;
    *   }
    *
    * The following is safe:
@@ -3751,7 +3751,7 @@ public:
    *   auto json = "[\"temporary data\"]"_padded;
    *   auto docs = parser.parse_many(json);
    *   for (element doc : docs) {
-   *     cout << std::string(doc["title"]) << endl;
+   *     cout << std::string(doc["documentID"]) << endl;
    *   }
    *
    * ### Format
@@ -3782,9 +3782,9 @@ public:
    *   auto error = parser.load_many(path).get(docs);
    *   if (error) { cerr << error << endl; exit(1); }
    *   for (auto doc : docs) {
-   *     std::string_view title;
-   *     if ((error = doc["title"].get(title)) { cerr << error << endl; exit(1); }
-   *     cout << title << endl;
+   *     std::string_view documentID;
+   *     if ((error = doc["documentID"].get(documentID)) { cerr << error << endl; exit(1); }
+   *     cout << documentID << endl;
    *   }
    *
    * ### REQUIRED: Buffer Padding

@@ -3850,9 +3850,9 @@ namespace logger {
 
   // Logs a single line from the stage 2 DOM parser
   template<typename S>
-  static simdjson_really_inline void log_line(S &structurals, const char *title_prefix, const char *title, const char *detail) {
+  static simdjson_really_inline void log_line(S &structurals, const char *title_prefix, const char *documentID, const char *detail) {
     if (LOG_ENABLED) {
-      printf("| %*s%s%-*s ", log_depth*2, "", title_prefix, LOG_EVENT_LEN - log_depth*2 - int(strlen(title_prefix)), title);
+      printf("| %*s%s%-*s ", log_depth*2, "", title_prefix, LOG_EVENT_LEN - log_depth*2 - int(strlen(title_prefix)), documentID);
       auto current_index = structurals.at_beginning() ? nullptr : structurals.next_structural-1;
       auto next_index = structurals.next_structural;
       auto current = current_index ? &structurals.buf[*current_index] : (const uint8_t*)"                                                       ";
@@ -9084,9 +9084,9 @@ namespace logger {
 
   // Logs a single line from the stage 2 DOM parser
   template<typename S>
-  static simdjson_really_inline void log_line(S &structurals, const char *title_prefix, const char *title, const char *detail) {
+  static simdjson_really_inline void log_line(S &structurals, const char *title_prefix, const char *documentID, const char *detail) {
     if (LOG_ENABLED) {
-      printf("| %*s%s%-*s ", log_depth*2, "", title_prefix, LOG_EVENT_LEN - log_depth*2 - int(strlen(title_prefix)), title);
+      printf("| %*s%s%-*s ", log_depth*2, "", title_prefix, LOG_EVENT_LEN - log_depth*2 - int(strlen(title_prefix)), documentID);
       auto current_index = structurals.at_beginning() ? nullptr : structurals.next_structural-1;
       auto next_index = structurals.next_structural;
       auto current = current_index ? &structurals.buf[*current_index] : (const uint8_t*)"                                                       ";

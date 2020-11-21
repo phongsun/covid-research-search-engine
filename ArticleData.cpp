@@ -3,6 +3,6 @@
 //
 
 #include "ArticleData.h"
-ArticleData::ArticleData(string title) {
-    this->title = title;
+ArticleData::ArticleData(string documentID) {
+    this->documentID = documentID;
 }
