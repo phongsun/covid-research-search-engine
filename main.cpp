@@ -18,16 +18,15 @@ int main(int argc, char** argv) {
 
     DSAvlTree<IndexNodeData> invertedIndexTree;
 
-
     //Catch::Session().run();
     DocumentParser documentParser = DocumentParser(corpusDir, "./stop_words.txt");
 
-    //std::chrono::milliseconds parseTime(0);
-    //auto t1 = chrono::high_resolution_clock::now();
+    std::chrono::milliseconds parseTime(0);
+    auto t1 = chrono::high_resolution_clock::now();
     documentParser.parse(invertedIndexTree);
-    //auto t2 = chrono::high_resolution_clock::now();
-    //auto parseTime = duration_cast<std::chrono::milliseconds>(t2 - t1);
-    //cout << "Milliseconds that parsing takes: " << parseTime.count() << endl;
+    auto t2 = chrono::high_resolution_clock::now();
+    parseTime = duration_cast<std::chrono::milliseconds>(t2 - t1);
+    cout << "Milliseconds that parsing takes: " << parseTime.count() << endl;
     IndexNodeData searchQuery;
     searchQuery.keyWord = searchPhrase;
     DSAvlNode<IndexNodeData> *node = invertedIndexTree.search(searchQuery);

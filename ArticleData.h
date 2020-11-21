@@ -6,9 +6,9 @@
 #define SEARCHENGINE_PAPERDATA_H
 
 #include <string>
-#include <set>
-#include <map>
 #include <vector>
+#include <unordered_set>
+#include <unordered_map>
 
 using namespace std;
 
@@ -17,9 +17,9 @@ public:
     ArticleData(string documentID);
 
     string documentID;
-    set<string> authorLastNames;
+    unordered_set<string> authorLastNames;
 
-    map<std::string, size_t> keyWordList;
+    unordered_map<std::string, size_t> keyWordList;
 };
 
 

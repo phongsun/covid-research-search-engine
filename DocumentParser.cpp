@@ -34,7 +34,7 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
             // if the documentID has more than 2 letters then it's a valid documentID
             if (title.size() >= 3) {
                 ArticleData articleData = ArticleData({documentID.begin(), documentID.end()});
-                std::map<std::string, size_t> wordFrequency;
+                unordered_map<std::string, size_t> wordFrequency;
                 string_view lastNameView;
                 string lastName;
                 // parse author's last name
@@ -94,9 +94,9 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
             }
         } // end of creating articleData for the current article file
 
-        if(i > 100){ // only three files are processed for now
+        /*if(i > 1000){ // only three files are processed for now
             return;
-        }
+        }*/
     }
     cout << "number of files parsed: " << i << endl;
     closedir(dir);
