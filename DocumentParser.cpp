@@ -19,6 +19,7 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
     struct dirent *entry;
     DIR *dir = opendir(this->corpusPath.c_str());
     if (dir == NULL) {
+        cout << "Directory not found for " << this->corpusPath << endl;
         return;
     }
 
@@ -94,9 +95,9 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
             }
         } // end of creating articleData for the current article file
 
-        /*if(i > 1000){ // only three files are processed for now
+        if(i > 1000){ // only three files are processed for now
             return;
-        }*/
+        }
     }
     //cout << "number of files parsed: " << i << endl;
     closedir(dir);
