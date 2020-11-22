@@ -31,14 +31,14 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
             simdjson::dom::element paper = parser.load(fullPath);
             string_view title = paper["metadata"]["title"].get_string();
             string_view documentID = paper["paper_id"].get_string();
-            // if the documentID has more than 2 letters then it's a valid documentID
+            // if the title has more than 2 letters then it's a valid title
             if (title.size() >= 3) {
                 ArticleData articleData = ArticleData({documentID.begin(), documentID.end()});
                 unordered_map<std::string, size_t> wordFrequency;
                 string_view lastNameView;
                 string lastName;
                 // parse author's last name
-                /*for(auto author : paper["metadata"]["authors"]){
+                for(auto author : paper["metadata"]["authors"]){
                     if (author["last"].get_string_length() > 0) {
                         lastNameView = author["last"].get_string();
                     }
@@ -49,7 +49,7 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
                     lastName = {lastNameView.begin(), lastNameView.end()};
                     transform (lastName.begin(), lastName.end(), lastName.begin(), ::tolower);
                     articleData.authorLastNames.insert(lastName);
-                }*/
+                }
 
                 // parse the body text
                 for (auto bodyText: paper["body_text"]) {
