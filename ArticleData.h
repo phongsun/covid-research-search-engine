@@ -19,7 +19,7 @@ public:
     string documentID;
     unordered_set<string> authorLastNames;
 
-    unordered_map<std::string, size_t> keyWordList;
+    unordered_map<std::string, unsigned int> keyWordList;
 };
 
 

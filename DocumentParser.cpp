@@ -35,7 +35,6 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
             // if the title has more than 2 letters then it's a valid title
             if (title.size() >= 3) {
                 ArticleData articleData = ArticleData({documentID.begin(), documentID.end()});
-                unordered_map<std::string, size_t> wordFrequency;
                 string_view lastNameView;
                 string lastName;
                 // parse author's last name
@@ -71,7 +70,7 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
                         // check stop word, check if length is greater than 2 or not
                         if (token.length() > 2 && stopWords.count(token) == 0){
                             if(stemmedWordMap.count(token) > 0){ // if the token has already been stemmed before, then the stemmed word for the token is obtained and the frequency is increased
-                                ++wordFrequency[stemmedWordMap[token]];
+                                ++articleData.keyWordList[stemmedWordMap[token]];
                             }else{ // if the token has not been stemmed before
                                 //
                                 // trim and stem the word
@@ -79,7 +78,7 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
                                 string oldToken = token;
                                 Porter2Stemmer::stem(token);
                                 // count the frequency of each word that aren't stop words and stemmed
-                                ++wordFrequency[token];
+                                ++articleData.keyWordList[token];
                                 // add the stemmed token to the stemmed word map
                                 stemmedWordMap[oldToken] = token;
                             }
@@ -87,7 +86,6 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
                     }
                 } // end of parsing body text
 
-                articleData.keyWordList = wordFrequency;
                 this->addArticleToKeywordIndex(keywordIndex, articleData);
 
             } else { // no documentID should be less than 3 characters
@@ -95,9 +93,9 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
             }
         } // end of creating articleData for the current article file
 
-        if(i > 1000){ // only three files are processed for now
+        /*if(i > 1000){ // only three files are processed for now
             return;
-        }
+        }*/
     }
     //cout << "number of files parsed: " << i << endl;
     closedir(dir);
@@ -122,17 +120,20 @@ unordered_set<string> DocumentParser::loadStopWords(const string &filePath){
 }
 
 inline void DocumentParser::addArticleToKeywordIndex(DSAvlTree<IndexNodeData> &avlTree, const ArticleData &articleData){
+    unsigned int noOfWordsInArticle = articleData.keyWordList.size();
     // loop through all the keywords in the article
     for(auto keyWordAndFreq: articleData.keyWordList){
+        // multiplied by 100000 to make the termFreq an accurate int
+        unsigned int termFreq = (keyWordAndFreq.second * 100000) / noOfWordsInArticle;
         IndexNodeData keyWordNodeData;
         keyWordNodeData.keyWord = keyWordAndFreq.first;
         DSAvlNode<IndexNodeData> *node = avlTree.search(keyWordNodeData);
         if(node == nullptr){ // keyword doesn't exist in the avlTree
-            keyWordNodeData.invertedFreq[articleData.documentID] = keyWordAndFreq.second;
+            keyWordNodeData.invertedTermFreq[articleData.documentID] = termFreq;
             // insert the new data because the keyword wasn't in the tree yet
             avlTree.insert(keyWordNodeData);
         }else{ // add the word frequency by the documentID of the article to the node; no need to insert because the node is already in the tree
-            node->element.invertedFreq[articleData.documentID] = keyWordAndFreq.second;
+            node->element.invertedTermFreq[articleData.documentID] = termFreq;
         }
     }
     // insert the keywords into the avlTree

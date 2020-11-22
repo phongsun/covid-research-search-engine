@@ -16,8 +16,10 @@ public:
     bool operator== (const IndexNodeData& rhs) const;
     bool operator< (const IndexNodeData& rhs) const;
     bool operator> (const IndexNodeData& rhs) const;
+
     string keyWord;
-    unordered_map<string, int> invertedFreq;
+    unordered_map<string, unsigned int> invertedTermFreq;
+    unsigned int inverseDocFreq;
 
 };
 

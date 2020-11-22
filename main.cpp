@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
     documentParser.parse(invertedIndexTree);
     std::chrono::time_point<std::chrono::high_resolution_clock> t2 = chrono::high_resolution_clock::now();
     parseTime = (std::chrono::duration_cast<std::chrono::milliseconds>)(t2 - t1);
-    cout << "Milliseconds that parsing takes: " << parseTime.count() << endl;
+
     IndexNodeData searchQuery;
     searchQuery.keyWord = searchPhrase;
     DSAvlNode<IndexNodeData> *node = invertedIndexTree.search(searchQuery);
@@ -34,11 +34,13 @@ int main(int argc, char** argv) {
     if(node == nullptr){
         cout << "Not found" << endl;
     }else{
-        for(auto titleAndFreq : node->element.invertedFreq){
+        for(auto titleAndFreq : node->element.invertedTermFreq){
             //cout <<  "The word \"" << searchPhrase << "\" appears " << titleAndFreq.second << " times in article ID \"" << titleAndFreq.first << "\"" <<endl;
             cout << titleAndFreq.first << endl;
         }
     }
+
+    cout << "Milliseconds that parsing takes: " << parseTime.count() << endl;
 
     return 0;
 }
