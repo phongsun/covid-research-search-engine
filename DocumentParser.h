@@ -19,13 +19,17 @@ using namespace std;
 
 class DocumentParser {
 public:
-    DocumentParser(const string &corpusPath, const string &stopwordPath);
+    DocumentParser(const string &corpusPath, const string &stopwordPath, const string &metaDataFileName);
     void parse(DSAvlTree<IndexNodeData> &keywordIndex);
-    unordered_set<string> loadStopWords(const string &filePath);
+    inline void loadMetaData();
+    inline unordered_set<string> loadStopWords(const string &filePath);
     inline void addArticleToKeywordIndex(DSAvlTree<IndexNodeData> &avlTree, const ArticleData &articleData);
 private:
     string corpusPath;
     string stopwordPath;
+    string metaDataFileName;
+
+    unordered_map<string, string> metaDataMap; // constains full text articles and publishing time
 };
 
 

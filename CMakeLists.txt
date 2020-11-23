@@ -4,9 +4,10 @@ set (EXE_NAME search_engine_peter_sun)
 
 set (input01 "stop_words.txt")
 set (input02 "test_article.json")
+set (input03 "metadata-cs2341.csv")
 
 # Copy data files to build dir
-foreach(file IN LISTS input01 input02)
+foreach(file IN LISTS input01 input02 input03)
     configure_file(${file} ${file} COPYONLY)
 endforeach()
 

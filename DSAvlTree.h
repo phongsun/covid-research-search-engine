@@ -21,8 +21,12 @@ public:
         return search(data, this->root);
     }
 
+    int height() {
+        return this->root->height;
+    }
+
     int count() {
-        return count(root);
+        return count(this->root);
     }
 
 private:

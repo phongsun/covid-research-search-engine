@@ -9,6 +9,8 @@
 using namespace std;
 
 int main(int argc, char** argv) {
+    std::chrono::milliseconds parseTime(0);
+    std::chrono::time_point<std::chrono::high_resolution_clock> t1 = chrono::high_resolution_clock::now();
 
     string searchPhrase = argv[1];
     transform (searchPhrase.begin(), searchPhrase.end(), searchPhrase.begin(), ::tolower);
@@ -19,13 +21,9 @@ int main(int argc, char** argv) {
     DSAvlTree<IndexNodeData> invertedIndexTree;
 
     //Catch::Session().run();
-    DocumentParser documentParser = DocumentParser(corpusDir, "./stop_words.txt");
+    DocumentParser documentParser = DocumentParser(corpusDir, "./stop_words.txt", "metadata-cs2341.csv");
 
-    std::chrono::milliseconds parseTime(0);
-    std::chrono::time_point<std::chrono::high_resolution_clock> t1 = chrono::high_resolution_clock::now();
     documentParser.parse(invertedIndexTree);
-    std::chrono::time_point<std::chrono::high_resolution_clock> t2 = chrono::high_resolution_clock::now();
-    parseTime = (std::chrono::duration_cast<std::chrono::milliseconds>)(t2 - t1);
 
     IndexNodeData searchQuery;
     searchQuery.keyWord = searchPhrase;
@@ -40,7 +38,12 @@ int main(int argc, char** argv) {
         }
     }
 
-    cout << "Milliseconds that parsing takes: " << parseTime.count() << endl;
+    std::chrono::time_point<std::chrono::high_resolution_clock> t2 = chrono::high_resolution_clock::now();
+    parseTime = (std::chrono::duration_cast<std::chrono::milliseconds>)(t2 - t1);
+    cout << endl << "--------------- stats ----------------" << endl;
+    cout << "Keywords (# of nodes) in index (tree): " << invertedIndexTree.count() << endl;
+    cout << "AVL Tree Root Height: " << invertedIndexTree.height() << endl;
+    cout << "Milliseconds that the program takes: " << parseTime.count() << endl;
 
     return 0;
 }

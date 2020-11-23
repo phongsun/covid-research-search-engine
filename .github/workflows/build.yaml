@@ -8,7 +8,7 @@ env:
   ###   List them in the order that they need to appear in Argv param of main.
   ###   Output Files will follow input files
   ###   Note: These should be the actual names of the files.  No double quotes
-  INPUT_FILES: stop_words.txt test_article.json
+  INPUT_FILES: stop_words.txt test_article.json metadata-cs2341.csv
   OUTPUT_FILES: output.txt
 
 ### DO NOT MODIFY ANYTHING BELOW THIS LINE!!!
