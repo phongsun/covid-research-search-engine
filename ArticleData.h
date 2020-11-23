@@ -17,6 +17,7 @@ public:
     ArticleData(string documentID);
 
     string documentID;
+
     unordered_set<string> authorLastNames;
 
     unordered_map<std::string, unsigned int> keyWordList;

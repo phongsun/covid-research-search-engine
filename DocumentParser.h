@@ -14,6 +14,7 @@
 #include "porter2_stemmer.h"
 #include "DSAvlTree.h"
 #include "IndexNodeData.h"
+#include "ArticleMetaData.h"
 
 using namespace std;
 
@@ -29,7 +30,7 @@ private:
     string stopwordPath;
     string metaDataFileName;
 
-    unordered_map<string, string> metaDataMap; // constains full text articles and publishing time
+    unordered_map<string, ArticleMetaData> metaDataMap; // constains full text articles and publishing time
 };
 
 
