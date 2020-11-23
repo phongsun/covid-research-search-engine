@@ -30,13 +30,14 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
         string fullPath = this->corpusPath + "/" + entry->d_name;
         // .json is only one type of file in the folder out of various types
         if (fullPath.find(".json") != string::npos) {
-            i++;
+
             simdjson::dom::element paper = parser.load(fullPath);
 
             string_view documentID_v = paper["paper_id"].get_string();
             string documentID = {documentID_v.begin(), documentID_v.end()};
             // if the document id is not full text, then next
             if (this->metaDataMap.count(documentID) > 0) {
+                i++;
                 string_view title = paper["metadata"]["title"].get_string();
 
                 ArticleData articleData = ArticleData(documentID);
@@ -101,11 +102,11 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
             }
         } // end of creating articleData for the current article file
 
-        /*if(i > 1000){ // only three files are processed for now
+        /*if(i == 1000){ // only 1000 files are processed for now
             return;
         }*/
     }
-    //cout << "number of files parsed: " << i << endl;
+    cout << "number of files parsed: " << i << endl;
     closedir(dir);
 
 }
