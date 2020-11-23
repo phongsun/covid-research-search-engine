@@ -50,7 +50,7 @@ jobs:
         working-directory: ${{runner.workspace}}/build
         shell: bash
         # Execute the build.  You can specify a specific target with "--target <NAME>"
-        run: cmake -o3 --build . --config $BUILD_TYPE
+        run: cmake --build . --config $BUILD_TYPE
 
       - name: List contents of build directory
         run: ls -al ${{runner.workspace}}/build
