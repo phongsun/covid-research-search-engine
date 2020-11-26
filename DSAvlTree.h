@@ -29,6 +29,9 @@ public:
         return count(this->root);
     }
 
+    DSAvlNode<T> returnRoot(){
+        return *this->root;
+    }
 private:
     DSAvlNode<T> *root;
 

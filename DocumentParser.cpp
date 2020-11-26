@@ -119,6 +119,7 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
         } // end of creating articleData for the current article file
 
         if(i == 1000){ // only 1000 files are processed for now
+            cout << "number of files parsed: " << i << endl;
             return;
         }
     }
@@ -215,4 +216,6 @@ inline void DocumentParser::addArticleToKeywordIndex(DSAvlTree<IndexNodeData> &a
             node->element.invertedTermFreq[articleData.documentID] = termFreq;
         }
     }
+
+    this->finalIndex = avlTree;
 }

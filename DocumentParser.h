@@ -25,7 +25,8 @@ public:
     inline void loadMetaData();
     inline unordered_set<string> loadStopWords(const string &filePath);
     inline void addArticleToKeywordIndex(DSAvlTree<IndexNodeData> &avlTree, const ArticleData &articleData);
-private:
+    DSAvlTree<IndexNodeData> finalIndex;
+
     string corpusPath;
     string stopwordPath;
     string metaDataFileName;
