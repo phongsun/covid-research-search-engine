@@ -17,7 +17,7 @@ class IndexHandler {
 public:
     IndexHandler(const string &corpusPath, const unordered_map<string, ArticleMetaData> &metaDataMap);
     int createIndex();
-    unordered_map<string, unsigned int> searchByKeyword(const string &keyWord);
+    IndexNodeData searchByKeyword(const string &keyWord);
     unordered_map<string, ArticleMetaData> metaDataMap;
 private:
     DSAvlTree<IndexNodeData> keyWordIndex;

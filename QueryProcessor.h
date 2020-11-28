@@ -10,6 +10,7 @@
 #include <iostream>
 #include "ArticleMetaData.h"
 #include "IndexHandler.h"
+#include "QueryResultData.h"
 
 using namespace std;
 
@@ -18,7 +19,7 @@ class QueryProcessor {
 public:
     QueryProcessor(IndexHandler *indexHandler);
     unsigned int createIndex();
-    set<string> search(string logicOp, vector<string> searchWords, vector<string> excludedWords, vector<string> authors);
+    set<QueryResultData> search(string logicOp, vector<string> searchWords, vector<string> excludedWords, vector<string> authors);
     vector<string>* parseQueryString(const string &queryString);
 
     void preprocess(string &input, bool shouldStem = true);

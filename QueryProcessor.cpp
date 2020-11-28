@@ -12,7 +12,7 @@ unsigned int QueryProcessor::createIndex(){
     return this->indexHandler->createIndex();
 }
 
-set<string> QueryProcessor::search(string logicOp, vector<string> searchWords, vector<string> excludedWords, vector<string> authors){
+set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searchWords, vector<string> excludedWords, vector<string> authors){
     /*set<string> retVal;
     unordered_map<string, unsigned int> documentIdAndIdfMap = this->indexHandler->searchByKeyword(queryString);
     string articleInfo = "";
@@ -23,8 +23,29 @@ set<string> QueryProcessor::search(string logicOp, vector<string> searchWords, v
         retVal.insert(articleInfo);
     }
     return retVal;*/
+    set<QueryResultData> queryResultSet;
 
+    if(logicOp.compare("NONE") && excludedWords.size() == 0 && authors.size() == 0){ // single keyword scenario
+        string singleKeyword = searchWords[0];
+        preprocess(singleKeyword);
+        // search index
+        IndexNodeData singleKeywordSearchResults = this->indexHandler->searchByKeyword(singleKeyword);
+        // combine QueryResultData
+        for(auto docIdAndTf: singleKeywordSearchResults.invertedTermFreq){
+            QueryResultData queryResultData;
+            queryResultData.documentId = docIdAndTf.first;
+            queryResultData.tf = docIdAndTf.second;
+            queryResultData.idf = singleKeywordSearchResults.inverseDocFreq;
+            queryResultData.publicationDate = this->indexHandler->metaDataMap[docIdAndTf.first].publicationDate;
+            queryResultData.title = this->indexHandler->metaDataMap[docIdAndTf.first].title;
+            // abstract and authors
+            queryResultData.authorString = this->indexHandler->metaDataMap[docIdAndTf.first].author;
+            queryResultData.abstract = this->indexHandler->metaDataMap[docIdAndTf.first].abstract;
+            queryResultSet.insert(queryResultData);
+        }
+    }
 
+    return queryResultSet;
 }
 
 vector<string>* QueryProcessor::parseQueryString(const string &queryString){

@@ -19,7 +19,7 @@ public:
 
     string keyWord;
     unordered_map<string, unsigned int> invertedTermFreq;
-    unsigned int inverseDocFreq;
+    unsigned int inverseDocFreq; // IDF(t) = log_e(Total number of documents / Number of documents with term t in it).
 
 };
 

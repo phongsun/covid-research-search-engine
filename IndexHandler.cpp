@@ -17,10 +17,10 @@ int IndexHandler::createIndex(){
     return this->keyWordIndex.count();
 }
 
-unordered_map<string, unsigned int> IndexHandler::searchByKeyword(const string &keyWord){
+IndexNodeData IndexHandler::searchByKeyword(const string &keyWord){
     IndexNodeData searchQuery;
     searchQuery.keyWord = keyWord;
     DSAvlNode<IndexNodeData> *node = this->keyWordIndex.search(searchQuery);
-    return node->element.invertedTermFreq;
+    return searchQuery;
 
 }
