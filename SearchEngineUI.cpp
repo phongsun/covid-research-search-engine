@@ -47,7 +47,7 @@ void SearchEngineUI::clearIndex() {
 
 void SearchEngineUI::searchByKeyword(const string &queryString){
     set<string> result;
-    result = this->queryProcessor->search(queryString);
+    //result = this->queryProcessor->search(queryString);
     for(auto d : result){
         cout << d << endl;
     }

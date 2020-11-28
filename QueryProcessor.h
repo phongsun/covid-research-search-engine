@@ -7,6 +7,7 @@
 #include <string>
 #include <unordered_map>
 #include <set>
+#include <iostream>
 #include "ArticleMetaData.h"
 #include "IndexHandler.h"
 
@@ -17,7 +18,10 @@ class QueryProcessor {
 public:
     QueryProcessor(IndexHandler *indexHandler);
     unsigned int createIndex();
-    set<string> search(string queryString);
+    set<string> search(string logicOp, vector<string> searchWords, vector<string> excludedWords, vector<string> authors);
+    vector<string>* parseQueryString(const string &queryString);
+
+    void preprocess(string &input, bool shouldStem = true);
 private:
     IndexHandler *indexHandler;
 };

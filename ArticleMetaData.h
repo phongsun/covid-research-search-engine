@@ -11,6 +11,7 @@ using namespace std;
 class ArticleMetaData {
 public:
     string title;
+    string author;
     string abstract;
     string publicationDate;
 };

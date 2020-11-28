@@ -47,6 +47,7 @@ unordered_map<string, ArticleMetaData> loadMetaData(const string &corpusPath){
             result.push_back(string(mystart));   // last field delimited by end of line instead of comma
             ArticleMetaData metaData;
             metaData.publicationDate = result[9];
+            metaData.author = result[10];
             metaData.title = result[3];
             metaData.abstract = result[8];
 
@@ -64,6 +65,8 @@ unordered_map<string, ArticleMetaData> loadMetaData(const string &corpusPath){
 
 
 int main(int argc, char** argv) {
+    Catch::Session().run();
+    return 0;
 
     std::chrono::milliseconds parseTime(0);
     std::chrono::time_point<std::chrono::high_resolution_clock> t1 = chrono::high_resolution_clock::now();
@@ -80,7 +83,6 @@ int main(int argc, char** argv) {
     QueryProcessor *queryProcessor = new QueryProcessor(indexHandler);
 
     SearchEngineUI searchEngineUi = SearchEngineUI(queryProcessor);
-    //Catch::Session().run();
 
     /*IndexNodeData searchQuery;
     searchQuery.keyWord = searchPhrase;
