@@ -6,10 +6,11 @@
 
 using namespace std;
 
-SearchEngineUI::SearchEngineUI(IndexHandler *indexHandler) {
+SearchEngineUI::SearchEngineUI(QueryProcessor *queryProcessor) {
+
     bool isDone = false;
+    this->queryProcessor = queryProcessor;
     while(isDone == false) {
-        this->indexHandler = indexHandler;
         cout << "Welcome to the COVID-19 search engine!" << endl;
         cout << "1) Clear the index" << endl;
         cout << "2) Parse corpus" << endl;
@@ -20,9 +21,9 @@ SearchEngineUI::SearchEngineUI(IndexHandler *indexHandler) {
         int choice;
         cin >> choice;
         if (choice == 1) {
-            clearIndex(this->indexHandler->keyWordIndex);
+            clearIndex();
         } else if (choice == 2) {
-            this->indexHandler->createIndex();
+            int keywordsParsed = this->queryProcessor->createIndex();
         } else if (choice == 3) {
 
         } else if (choice == 4) {
@@ -36,26 +37,19 @@ SearchEngineUI::SearchEngineUI(IndexHandler *indexHandler) {
     }
 }
 
-void SearchEngineUI::clearIndex(DSAvlTree<IndexNodeData> &keywordIndex) {
-    DSAvlTree<IndexNodeData> newTree;
-    cout << "Size of new tree: " << newTree.count() << endl;
+void SearchEngineUI::clearIndex() {
+    //DSAvlTree<IndexNodeData> newTree;
+    //cout << "Size of new tree: " << newTree.count() << endl;
     //this->keywordIndex = newTree;
-    cout << "Size of cleared tree: " << newTree.count() << endl;
+    //cout << "Size of cleared tree: " << newTree.count() << endl;
 }
 
-void SearchEngineUI::parseCorpus(DSAvlTree<IndexNodeData> &keywordIndex, string corpusDir){
-    int keywordsParsed = this->indexHandler->createIndex();
-    cout << "Index has been created and the number of keywords is " << keywordsParsed << endl;
 
-
-}
-
-void SearchEngineUI::searchByKeyword(const string &keyword){
-    unordered_map<string, unsigned int> result;
-    result = this->indexHandler->searchByKeyword(keyword);
+void SearchEngineUI::searchByKeyword(const string &queryString){
+    set<string> result;
+    result = this->queryProcessor->search(queryString);
     for(auto d : result){
-        cout << "documentID: " << d.first << endl;
-        cout << "Term Frequency: " << d.second << endl;
+        cout << d << endl;
     }
 }
 

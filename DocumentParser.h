@@ -20,9 +20,8 @@ using namespace std;
 
 class DocumentParser {
 public:
-    DocumentParser(const string &corpusPath, const string &stopwordPath, const string &metaDataFileName);
+    DocumentParser(const string &corpusPath, const string &stopwordPath, const unordered_map<string, ArticleMetaData> &metaDataMap);
     void parse(DSAvlTree<IndexNodeData> &keywordIndex);
-    inline void loadMetaData();
     inline unordered_set<string> loadStopWords(const string &filePath);
     inline void addArticleToKeywordIndex(DSAvlTree<IndexNodeData> &avlTree, const ArticleData &articleData);
     DSAvlTree<IndexNodeData> finalIndex;

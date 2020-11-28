@@ -5,17 +5,16 @@
 
 #include "DocumentParser.h"
 
-DocumentParser::DocumentParser(const string &corpusPath, const string &stopwordPath, const string &metaDataFileName){
+DocumentParser::DocumentParser(const string &corpusPath, const string &stopwordPath, const unordered_map<string, ArticleMetaData> &metaDataMap){
     this->corpusPath = corpusPath;
     this->stopwordPath = stopwordPath;
-    this->metaDataFileName = metaDataFileName;
+    this->metaDataMap = metaDataMap;
 }
 
 void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
     int i = 0;
     // 1. load full-text document ids and publishing dates from metadata CSV file
     // The code only parse a file if the document id is in the metadata file
-    loadMetaData();
 
     // 1.1. temporary storage to store words and the corresponding stemmed words
     // in order to avoid stem a word that was stemmed before
@@ -125,53 +124,6 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
     }
     cout << "number of files parsed: " << i << endl;
     closedir(dir);
-
-}
-
-inline void DocumentParser::loadMetaData(){
-    string filePath;
-
-    filePath = this->corpusPath
-            + (this->corpusPath.c_str()[this->corpusPath.size() - 1] == '/' ? "" : "/" )
-            + this->metaDataFileName;
-    std::ifstream file(filePath);
-
-    if (file.is_open()) {
-        std::string line;
-        while (std::getline(file, line)) {
-
-            // tokenize the line by comma
-            // only take the full text articles (16)
-            // map has key of documentId (1) and value of publish_time (9)
-            std::vector<std::string> result;
-            std::stringstream lineStream(line);
-            std::string cell;
-
-            // read full line
-            const char *mystart = line.c_str();    // prepare to parse the line - start is position of begin of field
-            bool instring{false};
-            for (const char *p = mystart; *p; p++) {  // iterate through the string
-                if (*p == '"')                        // toggle flag if we're btw double quote
-                    instring = !instring;
-                else if (*p == ',' && !instring) {    // if comma OUTSIDE double quote
-                    result.push_back(string(mystart, p - mystart));  // keep the field
-                    mystart = p + 1;                    // and start parsing next one
-                }
-            }
-            result.push_back(string(mystart));   // last field delimited by end of line instead of comma
-            ArticleMetaData metaData;
-            metaData.publicationDate = result[9];
-            metaData.title = result[3];
-            metaData.abstract = result[8];
-
-
-            this->metaDataMap[result[1]] = metaData;
-        }
-        file.close();
-
-    } else {
-        cout<< "Failed to load meta data file. Cannot find " << filePath << endl;
-    }
 
 }
 

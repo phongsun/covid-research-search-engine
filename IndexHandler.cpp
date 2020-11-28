@@ -4,15 +4,15 @@
 
 #include "IndexHandler.h"
 
-IndexHandler::IndexHandler(string corpusPath){
+IndexHandler::IndexHandler(const string &corpusPath, const unordered_map<string, ArticleMetaData> &metaDataMap){
     this->corpusPath = corpusPath;
+    this->metaDataMap = metaDataMap;
 
 }
 
 int IndexHandler::createIndex(){
 
-    DocumentParser documentParser = DocumentParser(this->corpusPath, this->stopWordFile, "metadata-cs2341.csv");
-    this->metaDataMap = documentParser.metaDataMap;
+    DocumentParser documentParser = DocumentParser(this->corpusPath, this->stopWordFile, this->metaDataMap);
     documentParser.parse(this->keyWordIndex);
     return this->keyWordIndex.count();
 }

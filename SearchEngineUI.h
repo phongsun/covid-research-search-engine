@@ -8,13 +8,13 @@
 #include "DSAvlTree.h"
 #include "IndexNodeData.h"
 #include "DocumentParser.h"
-#include "IndexHandler.h"
+#include "QueryProcessor.h"
 
 class SearchEngineUI {
 public:
-    SearchEngineUI(IndexHandler *indexHandler);
+    SearchEngineUI(QueryProcessor *queryProcessor);
     // option 1
-    void clearIndex(DSAvlTree<IndexNodeData> &keywordIndex);
+    void clearIndex();
 
     // option 2
     void parseCorpus(DSAvlTree<IndexNodeData> &keywordIndex, string corpusDir);
@@ -23,13 +23,13 @@ public:
     void openPersistenceFile();
 
     // option 4
-    void searchByKeyword(const string &keyword);
+    void searchByKeyword(const string &queryString);
 
     // option 5
     void printStatistics();
 
 private:
-    IndexHandler *indexHandler;
+    QueryProcessor *queryProcessor;
 };
 
 

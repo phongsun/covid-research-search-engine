@@ -15,17 +15,17 @@ using namespace std;
 
 class IndexHandler {
 public:
-    IndexHandler(string corpusPath);
+    IndexHandler(const string &corpusPath, const unordered_map<string, ArticleMetaData> &metaDataMap);
     int createIndex();
     unordered_map<string, unsigned int> searchByKeyword(const string &keyWord);
-//private:
+    unordered_map<string, ArticleMetaData> metaDataMap;
+private:
     DSAvlTree<IndexNodeData> keyWordIndex;
 
     string corpusPath;
     const string stopWordFile = "./stop_words.txt";
     const string keyWordIndexFile = "./keyword_index.txt";
     const string authorIndexFile = "./author_index.txt";
-    unordered_map<string, ArticleMetaData> metaDataMap;
 };
 
 
