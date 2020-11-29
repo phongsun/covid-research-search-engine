@@ -13,29 +13,19 @@ unsigned int QueryProcessor::createIndex(){
 }
 
 set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searchWords, vector<string> excludedWords, vector<string> authors){
-    /*set<string> retVal;
-    unordered_map<string, unsigned int> documentIdAndIdfMap = this->indexHandler->searchByKeyword(queryString);
-    string articleInfo = "";
-    for(auto documentIdandIdf: documentIdAndIdfMap){
-        string documentId = documentIdandIdf.first;
-        ArticleMetaData articleMetaData = indexHandler->metaDataMap[documentId];
-        string articleInfo = articleMetaData.publicationDate + " " + articleMetaData.title;
-        retVal.insert(articleInfo);
-    }
-    return retVal;*/
     set<QueryResultData> queryResultSet;
-
-    if(logicOp.compare("NONE") && excludedWords.size() == 0 && authors.size() == 0){ // single keyword scenario
+    if(logicOp.compare("NONE") == 0 && excludedWords.size() == 0 && authors.size() == 0){ // single keyword scenario
         string singleKeyword = searchWords[0];
         preprocess(singleKeyword);
         // search index
-        IndexNodeData singleKeywordSearchResults = this->indexHandler->searchByKeyword(singleKeyword);
+        IndexNodeData* singleKeywordSearchResults = this->indexHandler->searchByKeyword(singleKeyword);
+
         // combine QueryResultData
-        for(auto docIdAndTf: singleKeywordSearchResults.invertedTermFreq){
+        for(auto docIdAndTf: singleKeywordSearchResults->invertedTermFreq){
             QueryResultData queryResultData;
             queryResultData.documentId = docIdAndTf.first;
             queryResultData.tf = docIdAndTf.second;
-            queryResultData.idf = singleKeywordSearchResults.inverseDocFreq;
+            queryResultData.idf = singleKeywordSearchResults->inverseDocFreq;
             queryResultData.publicationDate = this->indexHandler->metaDataMap[docIdAndTf.first].publicationDate;
             queryResultData.title = this->indexHandler->metaDataMap[docIdAndTf.first].title;
             // abstract and authors
@@ -44,6 +34,7 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
             queryResultSet.insert(queryResultData);
         }
     }
+
 
     return queryResultSet;
 }
@@ -109,10 +100,10 @@ vector<string>* QueryProcessor::parseQueryString(const string &queryString){
         istringstream nos(exclusionString);
         exclusions = {istream_iterator<string>{nos}, istream_iterator<string>{}};
     }
-    retVal[0] = keyWords;
-    retVal[1] = authors;
-    retVal[2] = exclusions;
-    retVal[3] = logicOp;
+    retVal[KEYWORD] = keyWords;
+    retVal[AUTHOR] = authors;
+    retVal[EXCLUSION] = exclusions;
+    retVal[OP] = logicOp;
 
     return retVal;
 }

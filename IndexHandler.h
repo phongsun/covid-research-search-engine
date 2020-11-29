@@ -17,7 +17,7 @@ class IndexHandler {
 public:
     IndexHandler(const string &corpusPath);
     int createIndex();
-    IndexNodeData searchByKeyword(const string &keyWord);
+    IndexNodeData* searchByKeyword(const string &keyWord);
     unordered_map<string, ArticleMetaData> metaDataMap;
 
     int maxFilesToLoad = -1;

@@ -29,11 +29,11 @@ int IndexHandler::createIndex(){
     return this->keyWordIndex.count();
 }
 
-IndexNodeData IndexHandler::searchByKeyword(const string &keyWord){
+IndexNodeData* IndexHandler::searchByKeyword(const string &keyWord){
     IndexNodeData searchQuery;
     searchQuery.keyWord = keyWord;
     DSAvlNode<IndexNodeData> *node = this->keyWordIndex.search(searchQuery);
-    return searchQuery;
+    return &node->element;
 
 }
 

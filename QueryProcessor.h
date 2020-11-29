@@ -23,6 +23,12 @@ public:
     vector<string>* parseQueryString(const string &queryString);
 
     void preprocess(string &input, bool shouldStem = true);
+
+    const int OP = 3;
+    const int KEYWORD = 0;
+    const int AUTHOR = 1;
+    const int EXCLUSION = 2;
+
 private:
     IndexHandler *indexHandler;
 };

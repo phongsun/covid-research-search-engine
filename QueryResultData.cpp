@@ -41,16 +41,16 @@ bool QueryResultData::operator== (const QueryResultData& rhs) const{
 }
 
 bool QueryResultData::operator< (const QueryResultData& rhs) const{
-    if (this->tf < rhs.tf){
+    if (this->tf > rhs.tf){
         return true;
     }else if (this->tf == rhs.tf){
-        if(this->idf < rhs.idf){
+        if(this->idf > rhs.idf){
             return true;
         } else if (this->idf == rhs.idf){  // compare publication date
-            if (difftime(this->getPubDate(), rhs.getPubDate()) < 0) {
+            if (difftime(this->getPubDate(), rhs.getPubDate()) > 0) {
                 return true;
             } else if (difftime(this->getPubDate(), rhs.getPubDate()) == 0) { // date same, compare title
-                if (this->title.compare(rhs.title) < 0) {
+                if (this->title.compare(rhs.title) > 0) {
                     return true;
                 }  else {
                     return false;
@@ -67,16 +67,16 @@ bool QueryResultData::operator< (const QueryResultData& rhs) const{
 }
 
 bool QueryResultData::operator> (const QueryResultData& rhs) const{
-    if (this->tf > rhs.tf){
+    if (this->tf < rhs.tf){
         return true;
     }else if (this->tf == rhs.tf){
-        if(this->idf > rhs.idf){
+        if(this->idf < rhs.idf){
             return true;
         } else if (this->idf == rhs.idf){  // compare publication date
-            if (difftime(this->getPubDate(), rhs.getPubDate()) > 0) {
+            if (difftime(this->getPubDate(), rhs.getPubDate()) < 0) {
                 return true;
             } else if (difftime(this->getPubDate(), rhs.getPubDate()) == 0) { // date same, compare title
-                if (this->title.compare(rhs.title) > 0) {
+                if (this->title.compare(rhs.title) < 0) {
                     return true;
                 }  else {
                     return false;
