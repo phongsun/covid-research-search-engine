@@ -30,7 +30,13 @@ time_t QueryResultData::getPubDate() const {
     return mktime(ltm);
 }
 
+bool QueryResultData::operator== (const string& documentId) const{
+
+    return (this->documentId.compare(documentId) == 0);
+}
+
 bool QueryResultData::operator== (const QueryResultData& rhs) const{
+
     if(this->weight == rhs.weight
             && std::difftime(this->getPubDate(), rhs.getPubDate()) == 0 // pub date equals
             && this->title.compare(rhs.title) == 0){

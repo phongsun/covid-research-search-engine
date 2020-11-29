@@ -69,7 +69,22 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
                     // abstract and authors
                     queryResultData.authorString = this->indexHandler->metaDataMap[docIdAndTf.first].author;
                     queryResultData.abstract = this->indexHandler->metaDataMap[docIdAndTf.first].abstract;
-                    queryResultSet.insert(queryResultData);
+                    bool isInsert = true;
+                    // go through existing result set
+                    for(auto d : queryResultSet) {
+                        // if the document id already exist in the result set
+                        if (d ==  queryResultData.documentId) {
+                            // check if the weight of existing element is < than the new weight
+                            if (d.weight < queryResultData.weight) {
+                                // assign th bigger weight to exiting element.
+                                d.weight = queryResultData.weight;
+                            }
+                            isInsert = false;
+                            break;
+                        }
+                    }
+                    if (isInsert)
+                        queryResultSet.insert(queryResultData);
                 }
             }
         }

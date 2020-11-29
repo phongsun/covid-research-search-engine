@@ -120,11 +120,11 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
     }
 
     SECTION("Search with AND"){
-        IndexHandler *ih = new IndexHandler("../corpus");
+        IndexHandler *ih = new IndexHandler("../test_data");
         // load files into the index
         ih->createIndex();
 
-        string queryString = "AND covid cell";
+        string queryString = "AND cell covid";
         ih->searchByKeyword(queryString);
         QueryProcessor *qP = new QueryProcessor(ih);
         vector<string>* parsedQuery = qP->parseQueryString(queryString);

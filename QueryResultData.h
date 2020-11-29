@@ -19,7 +19,7 @@ public:
     bool operator== (const QueryResultData& rhs) const;
     bool operator< (const QueryResultData& rhs) const;
     bool operator> (const QueryResultData& rhs) const;
-
+    bool operator== (const string& documentId) const;
     string keyword;
     string documentId;
     unsigned int tf = 0;
