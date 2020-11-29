@@ -95,13 +95,13 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         REQUIRE(testVal[3][0].compare("NONE") == 0);
     }
 
-    SECTION("Testing searching"){
+    /*SECTION("Search with single keyword"){
         IndexHandler *ih = new IndexHandler("../corpus");
         // load 100 files into the index
         ih->maxFilesToLoad = 100;
         ih->createIndex();
 
-        /*cout << "------ " << ih->totalFilesLoaded << endl;
+        cout << "------ " << ih->totalFilesLoaded << endl;
         cout << "------ " << ih->avgKeyWordsIndexedPerArticle << endl;
         cout << "-----" << ih->totalIndexedWords << endl;
         int i = 0;
@@ -110,8 +110,24 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
             cout << ih->top50OriginalWords[i].first << " - " << ih->top50OriginalWords[i].second << " ^^^";
             cout << ih->topStemmed50Words[i].first << " + " << ih->topStemmed50Words[i].second << endl;
 
-        }*/
+        }
         string queryString = "cell";
+        ih->searchByKeyword(queryString);
+        QueryProcessor *qP = new QueryProcessor(ih);
+        vector<string>* parsedQuery = qP->parseQueryString(queryString);
+        set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        for(auto searchResult: searchResults){
+            cout << searchResult.tf << "  |  " << searchResult.documentId << "  |  " <<searchResult.title << endl;
+        }
+    }*/
+
+    SECTION("Search with AND"){
+        IndexHandler *ih = new IndexHandler("../corpus");
+        // load 100 files into the index
+        ih->maxFilesToLoad = 100;
+        ih->createIndex();
+
+        string queryString = "AND covid cell";
         ih->searchByKeyword(queryString);
         QueryProcessor *qP = new QueryProcessor(ih);
         vector<string>* parsedQuery = qP->parseQueryString(queryString);

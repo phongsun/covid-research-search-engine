@@ -33,7 +33,11 @@ IndexNodeData* IndexHandler::searchByKeyword(const string &keyWord){
     IndexNodeData searchQuery;
     searchQuery.keyWord = keyWord;
     DSAvlNode<IndexNodeData> *node = this->keyWordIndex.search(searchQuery);
-    return &node->element;
+    if(node == nullptr){
+        return nullptr;
+    }else {
+        return &node->element;
+    }
 
 }
 

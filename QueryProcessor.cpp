@@ -14,7 +14,67 @@ unsigned int QueryProcessor::createIndex(){
 
 set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searchWords, vector<string> excludedWords, vector<string> authors){
     set<QueryResultData> queryResultSet;
-    if(logicOp.compare("NONE") == 0 && excludedWords.size() == 0 && authors.size() == 0){ // single keyword scenario
+
+    // if the logic operator is AND
+    if(logicOp.compare("AND") == 0){
+        // declare an array of search results corresponding to the keywords
+        vector<IndexNodeData*> searchResults;
+        // set of the document IDs for each search result
+        vector<set<string>> documentIDSets;
+        // set that stores the intersection of all of the documentIDSets
+        set<string> intersection;
+        for(int i = 0; i < searchWords.size(); i++){ // go to the index to search every search word
+            IndexNodeData* searchResult;
+            searchResult = this->indexHandler->searchByKeyword(searchWords[i]);
+            if(searchResult != nullptr) {
+                searchResults.push_back(searchResult);
+            }
+        }
+
+        if (searchResults.size() == 0) {
+            return queryResultSet;
+        }
+
+        for (auto searchResult: searchResults) {
+            set<string> documentIDSet;
+            for (auto docIDAndTP: searchResult->invertedTermFreq) { // create a set of document IDs for each result to prepare to intersect;
+                documentIDSet.insert(docIDAndTP.first);
+            }
+            documentIDSets.push_back(documentIDSet);
+        }
+
+        // union the documentID from the searchResults array
+        if(documentIDSets.size() > 1) {
+            set_intersection(documentIDSets[0].begin(), documentIDSets[0].end(), documentIDSets[1].begin(), documentIDSets[1].end(), inserter(intersection, intersection.begin()));
+        } else {
+            intersection = documentIDSets[0];
+        }
+        /*for(int i = 2; i < documentIDSets.size(); i++){
+            set_intersection(documentIDSets[i].begin(), documentIDSets[i].end(), documentIDSets.begin(), documentIDSets.end(), inserter(intersection, intersection.begin()));
+        }*/
+
+        // filter the searchResults array based on the union of the document ID
+        for(auto searchResult: searchResults) {
+            // loop through each search result
+            for (auto docIdAndTf: searchResult->invertedTermFreq) {
+                // determine if the current document ID is in the intersection
+                if(intersection.find(docIdAndTf.first) != intersection.end()) { // only add the search result to the query result data if the documentID is in the documentIDSets
+                    QueryResultData queryResultData;
+                    queryResultData.documentId = docIdAndTf.first;
+                    queryResultData.tf = docIdAndTf.second;
+                    queryResultData.idf = searchResult->inverseDocFreq;
+                    queryResultData.publicationDate = this->indexHandler->metaDataMap[docIdAndTf.first].publicationDate;
+                    queryResultData.title = this->indexHandler->metaDataMap[docIdAndTf.first].title;
+                    // abstract and authors
+                    queryResultData.authorString = this->indexHandler->metaDataMap[docIdAndTf.first].author;
+                    queryResultData.abstract = this->indexHandler->metaDataMap[docIdAndTf.first].abstract;
+                    queryResultSet.insert(queryResultData);
+                }
+            }
+        }
+    }
+
+    else if(logicOp.compare("NONE") == 0 && excludedWords.size() == 0 && authors.size() == 0){ // single keyword scenario
         string singleKeyword = searchWords[0];
         preprocess(singleKeyword);
         // search index
