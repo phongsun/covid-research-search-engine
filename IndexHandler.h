@@ -15,17 +15,25 @@ using namespace std;
 
 class IndexHandler {
 public:
-    IndexHandler(const string &corpusPath, const unordered_map<string, ArticleMetaData> &metaDataMap);
+    IndexHandler(const string &corpusPath);
     int createIndex();
     IndexNodeData searchByKeyword(const string &keyWord);
     unordered_map<string, ArticleMetaData> metaDataMap;
+
+    int maxFilesToLoad = -1;
+    unsigned int totalFilesLoaded = 0;
+    unsigned int avgKeyWordsIndexedPerArticle = 0;
+    int totalIndexedWords = 0;
+    std::vector<std::pair<int,string>> topStemmed50Words;
+    std::vector<std::pair<int,string>> top50OriginalWords;
 private:
     DSAvlTree<IndexNodeData> keyWordIndex;
-
+    unordered_map<string, ArticleMetaData> loadMetaData(const string &corpusPath);
     string corpusPath;
     const string stopWordFile = "./stop_words.txt";
     const string keyWordIndexFile = "./keyword_index.txt";
     const string authorIndexFile = "./author_index.txt";
+
 };
 
 

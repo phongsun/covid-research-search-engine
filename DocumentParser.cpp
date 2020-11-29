@@ -12,14 +12,17 @@ DocumentParser::DocumentParser(const string &corpusPath, const string &stopwordP
 }
 
 void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
-    int i = 0;
+    int numberOfKeyWordsForArcticles = 0;
+
+    this->totalFilesLoaded = 0;
     // 1. load full-text document ids and publishing dates from metadata CSV file
     // The code only parse a file if the document id is in the metadata file
 
     // 1.1. temporary storage to store words and the corresponding stemmed words
     // in order to avoid stem a word that was stemmed before
     unordered_map<string, string> stemmedWordMap;
-
+    unordered_map<string, unsigned int> stemmedWordCount;
+    unordered_map<string, unsigned int> orginalWordCount;
     // 2. load stop words from stopwords.txt file
     unordered_set<string> stopWords = this->loadStopWords(this->stopwordPath);
 
@@ -46,7 +49,7 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
             string documentID = {documentID_v.begin(), documentID_v.end()};
             // 9. check if document_id is in meta data, if not back to the while loop
             if (this->metaDataMap.count(documentID) > 0) {
-                i++;
+                this->totalFilesLoaded++;
 
                 // 10. create a articleData object to represent current document
                 ArticleData articleData = ArticleData(documentID);
@@ -89,10 +92,14 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
                     for (auto token: tokens) {
                         // 18. check if current word is a stop word, if so go back to for loop
                         if (token.length() > 2 && stopWords.count(token) == 0) {
+                            orginalWordCount[token]++;
+
                             // 19. stem the non stop word
                             if (stemmedWordMap.count(token) >
                                 0) { // if the token has already been stemmed before, then the stemmed word for the token is obtained and the frequency is increased
                                 ++articleData.keyWordList[stemmedWordMap[token]]; // 20. increment count of the stemmed word
+
+                                ++stemmedWordCount[stemmedWordMap[token]];
                             } else { // if the token has not been stemmed before
                                 //
                                 // trim and stem the word
@@ -103,11 +110,15 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
                                 ++articleData.keyWordList[token];
                                 // add the stemmed token to the stemmed word map
                                 stemmedWordMap[oldToken] = token;
+
+                                ++stemmedWordCount[token];
                             }
+
                         }
                     }
                 } // end of parsing body text
-
+                // calculate the sum of number of keywords for each article
+                numberOfKeyWordsForArcticles += articleData.keyWordList.size();
                 // 21. all the data are parsed and collected in the articleData
                 // add it to the AvlTree - keywordIndex
                 this->addArticleToKeywordIndex(keywordIndex, articleData);
@@ -117,14 +128,54 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
             }
         } // end of creating articleData for the current article file
 
-        if(i == 1000){ // only 1000 files are processed for now
-            cout << "number of files parsed: " << i << endl;
-            return;
+        if(this->maxFilesToLoad > 0 && this->totalFilesLoaded == this->maxFilesToLoad){ // control number of files to load for testing
+            break;
         }
     }
-    cout << "number of files parsed: " << i << endl;
-    closedir(dir);
+    this->avgKeyWordsIndexedPerArticle = numberOfKeyWordsForArcticles / this->totalFilesLoaded;
 
+    /**************************************
+    * calculate 50 highestoriginal word counts
+    **************************************/
+    auto cmp = [](std::pair<int,string> const & a, std::pair<int,string> const & b)
+    {
+        return a.first != b.first?  a.first > b.first : a.second.compare(b.second) < 0;
+    };
+
+    for (auto wordRank : orginalWordCount) {
+        this->top50OriginalWords.push_back(pair<int, string>(wordRank.second, wordRank.first));
+    }
+    std::sort(this->top50OriginalWords.begin(), this->top50OriginalWords.end(), cmp);
+    this->top50OriginalWords.erase(this->top50OriginalWords.begin() + 50, this->top50OriginalWords.end());
+
+    /**************************************
+     * calculate 50 highest stemmed word counts
+     **************************************/
+    for (auto wordRank : stemmedWordCount) {
+
+        this->top50StemmedWords.push_back(pair<int, string>(wordRank.second, wordRank.first));
+    }
+    std::sort(this->top50StemmedWords.begin(), this->top50StemmedWords.end(), cmp);
+    this->top50StemmedWords.erase(this->top50StemmedWords.begin() + 50, this->top50StemmedWords.end());
+    // Add orginal words to each stemmed word
+    for (auto &topWord : this->top50StemmedWords) {
+        string key = topWord.second + " (";
+        auto check_value = [&](std::pair<const string, string> const &p) -> bool {
+            return (p.second.compare(topWord.second) == 0);
+        };
+
+        auto end = std::end(stemmedWordMap);
+        auto it = find_if(std::begin(stemmedWordMap), end, check_value);
+        while (it != end) {
+            key += it->first;
+            key += " ";
+            it = find_if(std::next(it), end, check_value);
+        }
+        key += ") ";
+        topWord.second = key;
+    }
+
+    closedir(dir);
 }
 
 inline unordered_set<string> DocumentParser::loadStopWords(const string &filePath){

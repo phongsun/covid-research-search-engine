@@ -81,18 +81,18 @@ vector<string>* QueryProcessor::parseQueryString(const string &queryString){
 
     if (notPos < queryString.length()) {
         exclusionString = queryString.substr(notPos + 5, queryString.length() - notPos);
-        cout<<"exclusions="<<queryString.length()<<"-"<<notPos << endl;
-        cout<<exclusionString<<endl;
+        //cout<<"exclusions="<<queryString.length()<<"-"<<notPos << endl;
+        //cout<<exclusionString<<endl;
     }
     if (authorsPos != notPos) {
         authorString = queryString.substr(authorsPos + 7, notPos - authorsPos - 7);
-        cout<<"author="<<notPos<<"-"<<(authorsPos+7) << endl;
-        cout<< "+==+++==" << authorString<<endl;
+        //cout<<"author="<<notPos<<"-"<<(authorsPos+7) << endl;
+        //cout<< "+==+++==" << authorString<<endl;
     }
     if (op.compare("NONE") != 0 || (notPos == authorsPos )) {
         keywordString = queryString.substr(keywordsPos, authorsPos - keywordsPos);
-        cout<<"keywords="<<authorsPos<<"-"<<keywordsPos << endl;
-        cout<<keywordString<<endl;
+        //cout<<"keywords="<<authorsPos<<"-"<<keywordsPos << endl;
+        //cout<<keywordString<<endl;
     }
 
     if (!keywordString.empty()) {

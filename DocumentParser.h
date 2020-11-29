@@ -9,6 +9,8 @@
 #include <unordered_set>
 #include <dirent.h>
 #include <fstream>
+#include <map>
+
 #include "simdjson.h"
 #include "ArticleData.h"
 #include "porter2_stemmer.h"
@@ -31,6 +33,12 @@ public:
     string metaDataFileName;
 
     unordered_map<string, ArticleMetaData> metaDataMap; // constains full text articles and publishing time
+
+    unsigned int totalFilesLoaded = 0;
+    unsigned int avgKeyWordsIndexedPerArticle = 0;
+    std::vector<std::pair<int,string>> top50StemmedWords;
+    std::vector<std::pair<int,string>> top50OriginalWords;
+    int maxFilesToLoad = -1;
 };
 
 
