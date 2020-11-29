@@ -21,11 +21,14 @@ public:
     unordered_map<string, ArticleMetaData> metaDataMap;
 
     int maxFilesToLoad = -1;
-    unsigned int totalFilesLoaded = 0;
-    unsigned int avgKeyWordsIndexedPerArticle = 0;
-    int totalIndexedWords = 0;
-    std::vector<std::pair<int,string>> topStemmed50Words;
-    std::vector<std::pair<int,string>> top50OriginalWords;
+    unsigned int totalArticlesIndexed = 0;
+    unsigned int avgWordsIndexedPerArticle = 0;
+    unsigned int totalWordsIndexed = 0;
+    int totalUniqueAuthors = 0;
+    std::vector<string> topStemmed50Words;
+    std::vector<string> top50OriginalWords;
+    std::vector<std::pair<int,string>> topStemmed50WordsData;
+    std::vector<std::pair<int,string>> top50OriginalWordsData;
 private:
     DSAvlTree<IndexNodeData> keyWordIndex;
     unordered_map<string, ArticleMetaData> loadMetaData(const string &corpusPath);

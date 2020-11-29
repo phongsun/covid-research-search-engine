@@ -22,8 +22,9 @@ public:
 
     string keyword;
     string documentId;
-    unsigned int tf;
-    unsigned int idf;
+    unsigned int tf = 0;
+    unsigned int idf = 0;
+    u_int64_t weight = 0;
     string publicationDate;
     string title;
     string authorString;

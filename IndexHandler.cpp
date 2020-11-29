@@ -11,21 +11,23 @@ IndexHandler::IndexHandler(const string &corpusPath){
 }
 
 int IndexHandler::createIndex(){
-    this->totalFilesLoaded = 0;
-    this->avgKeyWordsIndexedPerArticle = 0;
-    this->topStemmed50Words.clear();
-    this->top50OriginalWords.clear();
-    this->totalIndexedWords =  0;
+    this->totalArticlesIndexed = 0;
+    this->avgWordsIndexedPerArticle = 0;
+    this->topStemmed50WordsData.clear();
+    this->top50OriginalWordsData.clear();
+    this->totalWordsIndexed =  0;
+    this->totalUniqueAuthors = 0;
 
     DocumentParser documentParser = DocumentParser(this->corpusPath, this->stopWordFile, this->metaDataMap);
     documentParser.maxFilesToLoad = this->maxFilesToLoad;
     documentParser.parse(this->keyWordIndex);
 
-    this->totalFilesLoaded = documentParser.totalFilesLoaded;
-    this->avgKeyWordsIndexedPerArticle = documentParser.avgKeyWordsIndexedPerArticle;
-    this->topStemmed50Words = documentParser.top50StemmedWords;
-    this->top50OriginalWords = documentParser.top50OriginalWords;
-    this->totalIndexedWords =  this->keyWordIndex.count();
+    this->totalArticlesIndexed = documentParser.totalFilesLoaded;
+    this->avgWordsIndexedPerArticle = documentParser.avgKeyWordsIndexedPerArticle;
+    this->topStemmed50WordsData = documentParser.top50StemmedWords;
+    this->top50OriginalWordsData = documentParser.top50OriginalWords;
+    this->totalUniqueAuthors = documentParser.totalUniqueAuthors;
+    this->totalWordsIndexed =  this->keyWordIndex.count();
     return this->keyWordIndex.count();
 }
 
@@ -33,9 +35,10 @@ IndexNodeData* IndexHandler::searchByKeyword(const string &keyWord){
     IndexNodeData searchQuery;
     searchQuery.keyWord = keyWord;
     DSAvlNode<IndexNodeData> *node = this->keyWordIndex.search(searchQuery);
-    if(node == nullptr){
+    if(node == nullptr){ // no result found
         return nullptr;
     }else {
+        node->element.calculateIdf(this->totalArticlesIndexed);
         return &node->element;
     }
 

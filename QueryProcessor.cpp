@@ -62,7 +62,8 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
                     QueryResultData queryResultData;
                     queryResultData.documentId = docIdAndTf.first;
                     queryResultData.tf = docIdAndTf.second;
-                    queryResultData.idf = searchResult->inverseDocFreq;
+                    queryResultData.idf = searchResult->idf;
+                    queryResultData.weight = queryResultData.tf * queryResultData.idf;
                     queryResultData.publicationDate = this->indexHandler->metaDataMap[docIdAndTf.first].publicationDate;
                     queryResultData.title = this->indexHandler->metaDataMap[docIdAndTf.first].title;
                     // abstract and authors
@@ -85,7 +86,8 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
             QueryResultData queryResultData;
             queryResultData.documentId = docIdAndTf.first;
             queryResultData.tf = docIdAndTf.second;
-            queryResultData.idf = singleKeywordSearchResults->inverseDocFreq;
+            queryResultData.idf = singleKeywordSearchResults->idf;
+            queryResultData.weight = queryResultData.tf * queryResultData.idf;
             queryResultData.publicationDate = this->indexHandler->metaDataMap[docIdAndTf.first].publicationDate;
             queryResultData.title = this->indexHandler->metaDataMap[docIdAndTf.first].title;
             // abstract and authors

@@ -23,6 +23,7 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
     unordered_map<string, string> stemmedWordMap;
     unordered_map<string, unsigned int> stemmedWordCount;
     unordered_map<string, unsigned int> orginalWordCount;
+    unordered_map<string, unsigned int> uniqueAuthorCount;
     // 2. load stop words from stopwords.txt file
     unordered_set<string> stopWords = this->loadStopWords(this->stopwordPath);
 
@@ -55,18 +56,30 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
                 ArticleData articleData = ArticleData(documentID);
                 string_view lastNameView;
                 string lastName;
+                string_view firstNameView;
+                string firstName;
                 // 11. parse author's last name from json and add them to authors list in articleData object
                 for (auto author : paper["metadata"]["authors"]) {
                     if (author["last"].get_string_length() > 0) {
                         lastNameView = author["last"].get_string();
+                        if (author["first"].get_string_length() > 0) {
+                            firstNameView = author["first"].get_string();
+                        } else {
+                            firstNameView = lastNameView;
+                        }
                     }
                         // else if the last name is empty then use the first name
                     else {
                         lastNameView = author["first"].get_string();
+                        firstNameView = lastNameView;
                     }
                     lastName = {lastNameView.begin(), lastNameView.end()};
+                    firstName = {firstNameView.begin(), firstNameView.end()};
                     transform(lastName.begin(), lastName.end(), lastName.begin(), ::tolower);
+                    transform(firstName.begin(), firstName.end(), firstName.begin(), ::tolower);
                     articleData.authorLastNames.insert(lastName);
+                    string fullName = lastName+", "+firstName;
+                    uniqueAuthorCount[fullName]++;
                 }
 
                 // 12. loop through the body text of the article
@@ -132,8 +145,10 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
             break;
         }
     }
-    this->avgKeyWordsIndexedPerArticle = numberOfKeyWordsForArcticles / this->totalFilesLoaded;
 
+    // calculate stats
+    this->avgKeyWordsIndexedPerArticle = numberOfKeyWordsForArcticles / this->totalFilesLoaded;
+    this->totalUniqueAuthors = uniqueAuthorCount.size();
     /**************************************
     * calculate 50 highestoriginal word counts
     **************************************/

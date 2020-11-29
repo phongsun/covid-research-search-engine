@@ -7,27 +7,32 @@
 
 TEST_CASE("IndexHandler", "IndexHandler") {
     SECTION("Testing index stats") {
-        string corpusDir = "../corpus";
+        string corpusDir = "../test_data";
 
         IndexHandler *ih = new IndexHandler(corpusDir);
-        ih->maxFilesToLoad = 100;
         ih->createIndex();
 
-        /*cout << "------ " << ih->totalFilesLoaded << endl;
-        cout << "------ " << ih->avgKeyWordsIndexedPerArticle << endl;
-        cout << "-----" << ih->totalIndexedWords << endl;
+        /*cout << "------ " << ih->totalArticlesIndexed << endl;
+        cout << "------ " << ih->avgWordsIndexedPerArticle << endl;
+        cout << "-----" << ih->totalWordsIndexed << endl;
+        cout << "-----" << ih->totalUniqueAuthors << endl;
         int i = 0;
         for (int i = 0; i < 50; i++) {
 
-            cout << ih->top50OriginalWords[i].first << " - " << ih->top50OriginalWords[i].second << " ^^^";
-            cout << ih->topStemmed50Words[i].first << " + " << ih->topStemmed50Words[i].second << endl;
+            cout << ih->top50OriginalWordsData[i].first << " - " << ih->top50OriginalWordsData[i].second << " ^^^";
+            cout << ih->topStemmed50WordsData[i].first << " + " << ih->topStemmed50WordsData[i].second << endl;
 
         }*/
-        REQUIRE(ih->totalFilesLoaded <= ih->maxFilesToLoad);
-        REQUIRE(ih->avgKeyWordsIndexedPerArticle > 0);
-        REQUIRE(ih->totalIndexedWords > 0);
-        REQUIRE(ih->top50OriginalWords.size() == 50);
-        REQUIRE(ih->topStemmed50Words.size() == 50);
+        REQUIRE(ih->totalArticlesIndexed == 100);
+        REQUIRE(ih->avgWordsIndexedPerArticle == 594);
+        REQUIRE(ih->totalWordsIndexed == 14340);
+        REQUIRE(ih->totalUniqueAuthors == 736);
+        REQUIRE(ih->top50OriginalWordsData.size() == 50);
+        REQUIRE(ih->top50OriginalWordsData[0].second.compare("cells") == 0);
+        REQUIRE(ih->top50OriginalWordsData[49].second.compare("including") == 0);
+        REQUIRE(ih->topStemmed50WordsData.size() == 50);
+        REQUIRE(ih->topStemmed50WordsData[0].second.compare("cell (cells cell ) ") == 0);
+        REQUIRE(ih->topStemmed50WordsData[49].second.compare("perform (performed performing performance perform performs performances performer ) ") == 0);
 
         delete ih;
     }

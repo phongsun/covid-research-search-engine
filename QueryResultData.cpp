@@ -31,7 +31,7 @@ time_t QueryResultData::getPubDate() const {
 }
 
 bool QueryResultData::operator== (const QueryResultData& rhs) const{
-    if(this->tf == rhs.tf && this->idf == rhs.idf
+    if(this->weight == rhs.weight
             && std::difftime(this->getPubDate(), rhs.getPubDate()) == 0 // pub date equals
             && this->title.compare(rhs.title) == 0){
         return true;
@@ -41,21 +41,16 @@ bool QueryResultData::operator== (const QueryResultData& rhs) const{
 }
 
 bool QueryResultData::operator< (const QueryResultData& rhs) const{
-    if (this->tf > rhs.tf){
+    if (this->weight > rhs.weight){
         return true;
-    }else if (this->tf == rhs.tf){
-        if(this->idf > rhs.idf){
+    }else if (this->weight == rhs.weight){
+        // compare publication date
+        if (difftime(this->getPubDate(), rhs.getPubDate()) > 0) {
             return true;
-        } else if (this->idf == rhs.idf){  // compare publication date
-            if (difftime(this->getPubDate(), rhs.getPubDate()) > 0) {
+        } else if (difftime(this->getPubDate(), rhs.getPubDate()) == 0) { // date same, compare title
+            if (this->title.compare(rhs.title) > 0) {
                 return true;
-            } else if (difftime(this->getPubDate(), rhs.getPubDate()) == 0) { // date same, compare title
-                if (this->title.compare(rhs.title) > 0) {
-                    return true;
-                }  else {
-                    return false;
-                }
-            } else {
+            }  else {
                 return false;
             }
         } else {
@@ -67,27 +62,22 @@ bool QueryResultData::operator< (const QueryResultData& rhs) const{
 }
 
 bool QueryResultData::operator> (const QueryResultData& rhs) const{
-    if (this->tf < rhs.tf){
+    if (this->weight < rhs.weight){ // inverse the > to < so that set puts highest weight on top
         return true;
-    }else if (this->tf == rhs.tf){
-        if(this->idf < rhs.idf){
+    }else if (this->weight == rhs.weight){
+    // compare publication date
+        if (difftime(this->getPubDate(), rhs.getPubDate()) < 0) {
             return true;
-        } else if (this->idf == rhs.idf){  // compare publication date
-            if (difftime(this->getPubDate(), rhs.getPubDate()) < 0) {
+        } else if (difftime(this->getPubDate(), rhs.getPubDate()) == 0) { // date same, compare title
+            if (this->title.compare(rhs.title) < 0) {
                 return true;
-            } else if (difftime(this->getPubDate(), rhs.getPubDate()) == 0) { // date same, compare title
-                if (this->title.compare(rhs.title) < 0) {
-                    return true;
-                }  else {
-                    return false;
-                }
-            } else {
+            }  else {
                 return false;
             }
         } else {
             return false;
         }
-    }else{
+    } else{
         return false;
     }
 }

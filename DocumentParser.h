@@ -38,6 +38,7 @@ public:
     unsigned int avgKeyWordsIndexedPerArticle = 0;
     std::vector<std::pair<int,string>> top50StemmedWords;
     std::vector<std::pair<int,string>> top50OriginalWords;
+    int totalUniqueAuthors = 0;
     int maxFilesToLoad = -1;
 };
 

@@ -3,6 +3,7 @@ build/
 cmake-build-debug/
 .idea/
 corpus/
+design_documentation/
 
 # Prerequisites
 *.d
