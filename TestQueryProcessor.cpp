@@ -99,7 +99,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         IndexHandler *ih = new IndexHandler("../test_data");
         ih->createIndex();
 
-        cout << "------ " << ih->totalArticlesIndexed << endl;
+        /*cout << "------ " << ih->totalArticlesIndexed << endl;
         cout << "------ " << ih->avgWordsIndexedPerArticle << endl;
         cout << "-----" << ih->totalWordsIndexed << endl;
         int i = 0;
@@ -108,23 +108,23 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
             cout << ih->top50OriginalWordsData[i].first << " - " << ih->top50OriginalWordsData[i].second << " ^^^";
             cout << ih->topStemmed50WordsData[i].first << " + " << ih->topStemmed50WordsData[i].second << endl;
 
-        }
-        string queryString = "cell";
+        }*/
+        string queryString = "congestion";
         ih->searchByKeyword(queryString);
         QueryProcessor *qP = new QueryProcessor(ih);
         vector<string>* parsedQuery = qP->parseQueryString(queryString);
         set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
-        /*for(auto searchResult: searchResults){
-            cout <<searchResult.weight << "  |  "<<searchResult.idf << "  |  " <<searchResult.tf << "  |  " << searchResult.documentId << "  |  " <<searchResult.title << endl;
-        }*/
+        for(auto searchResult: searchResults){
+            //cout <<searchResult.weight << "  |  "<<searchResult.idf << "  |  " <<searchResult.tf << "  |  " << searchResult.documentId << "  |  " <<searchResult.title << endl;
+        }
     }
 
-    SECTION("Search with AND"){
+    SECTION("Search with AND only"){
         IndexHandler *ih = new IndexHandler("../test_data");
         // load files into the index
         ih->createIndex();
 
-        string queryString = "AND cell covid";
+        string queryString = "AND cell covid patients inflame Pediatric";
         ih->searchByKeyword(queryString);
         QueryProcessor *qP = new QueryProcessor(ih);
         vector<string>* parsedQuery = qP->parseQueryString(queryString);
@@ -134,4 +134,18 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         }
     }
 
+    SECTION("Search with OR only"){
+        IndexHandler *ih = new IndexHandler("../test_data");
+        // load files into the index
+        ih->createIndex();
+
+        string queryString = "OR covid congestion";
+        ih->searchByKeyword(queryString);
+        QueryProcessor *qP = new QueryProcessor(ih);
+        vector<string>* parsedQuery = qP->parseQueryString(queryString);
+        set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        for(auto searchResult: searchResults){
+            //cout << searchResult.weight << "  |  " << searchResult.documentId << "  |  " <<searchResult.title << endl;
+        }
+    }
 }

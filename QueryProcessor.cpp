@@ -15,6 +15,11 @@ unsigned int QueryProcessor::createIndex(){
 set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searchWords, vector<string> excludedWords, vector<string> authors){
     set<QueryResultData> queryResultSet;
 
+    cout << "logicOp: " << logicOp << endl;
+    for(auto searchWord: searchWords){
+        cout << "searchWord: " << searchWord << endl;
+    }
+
     // if the logic operator is AND
     if(logicOp.compare("AND") == 0){
         // declare an array of search results corresponding to the keywords
@@ -25,7 +30,9 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
         set<string> intersection;
         for(int i = 0; i < searchWords.size(); i++){ // go to the index to search every search word
             IndexNodeData* searchResult;
-            searchResult = this->indexHandler->searchByKeyword(searchWords[i]);
+            string searchPhrase = searchWords[i];
+            preprocess(searchPhrase);
+            searchResult = this->indexHandler->searchByKeyword(searchPhrase);
             if(searchResult != nullptr) {
                 searchResults.push_back(searchResult);
             }
@@ -43,15 +50,22 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
             documentIDSets.push_back(documentIDSet);
         }
 
-        // union the documentID from the searchResults array
-        if(documentIDSets.size() > 1) {
-            set_intersection(documentIDSets[0].begin(), documentIDSets[0].end(), documentIDSets[1].begin(), documentIDSets[1].end(), inserter(intersection, intersection.begin()));
-        } else {
+        vector<set<string>> tmpIntersectionList;
+        // intersect the documentID from the searchResults array
+        if(documentIDSets.size() > 1) { //multple search results
+            set<string> tmp0;
+            set_intersection(documentIDSets[0].begin(), documentIDSets[0].end(), documentIDSets[1].begin(), documentIDSets[1].end(), inserter(tmp0, tmp0.begin()));
+            tmpIntersectionList.push_back(tmp0);
+            for(int i = 2; i < documentIDSets.size(); i++){
+                set<string> prevIntersection = *(tmpIntersectionList.end() - 1);//last element of the vector
+                set<string> curIntersection;
+                set_intersection(documentIDSets[i].begin(), documentIDSets[i].end(), prevIntersection.begin(), prevIntersection.end(), inserter(curIntersection, curIntersection.begin()));
+                tmpIntersectionList.push_back(curIntersection);
+            }
+            intersection = *(tmpIntersectionList.end() - 1);
+        } else { // only one search result
             intersection = documentIDSets[0];
         }
-        /*for(int i = 2; i < documentIDSets.size(); i++){
-            set_intersection(documentIDSets[i].begin(), documentIDSets[i].end(), documentIDSets.begin(), documentIDSets.end(), inserter(intersection, intersection.begin()));
-        }*/
 
         // filter the searchResults array based on the union of the document ID
         for(auto searchResult: searchResults) {
@@ -90,12 +104,101 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
         }
     }
 
+    else if(logicOp.compare("OR") == 0){
+        // declare an array of search results corresponding to the keywords
+        vector<IndexNodeData*> searchResults;
+        // set of the document IDs for each search result
+        vector<set<string>> documentIDSets;
+        // set that stores the intersection of all of the documentIDSets
+        set<string> unionResult;
+
+
+
+        for(int i = 0; i < searchWords.size(); i++){ // go to the index to search every search word
+            cout << "searchWord[i] = *****" << searchWords[i] << "*****" << endl;
+            IndexNodeData* searchResult;
+            string searchPhrase = searchWords[i];
+            preprocess(searchPhrase);
+            searchResult = this->indexHandler->searchByKeyword(searchPhrase);
+            if(searchResult != nullptr) {
+                searchResults.push_back(searchResult);
+            }else{
+                cout << "Not found for " << searchPhrase << endl;
+            }
+        }
+
+        if (searchResults.size() == 0) { // if no results found
+            return queryResultSet; // return empty result set
+        }
+
+        cout << "^^^^^" << searchResults.size() << endl;
+        // create documentIDSets to perform the logical operation
+        for (auto searchResult: searchResults) {
+            set<string> documentIDSet;
+            for (auto docIDAndTP: searchResult->invertedTermFreq) { // create a set of document IDs for each result to prepare to intersect;
+                documentIDSet.insert(docIDAndTP.first);
+            }
+            documentIDSets.push_back(documentIDSet);
+        }
+
+        // union the documentID from the searchResults array
+        cout << "&&&&&" << documentIDSets.size() << endl;
+        if(documentIDSets.size() > 1) {
+            set_union(documentIDSets[0].begin(), documentIDSets[0].end(), documentIDSets[1].begin(), documentIDSets[1].end(), inserter(unionResult, unionResult.begin()));
+            cout << "*****" << documentIDSets[0].size() << " + " << documentIDSets[1].size() << " = " << unionResult.size() << endl;
+        } else {
+            unionResult = documentIDSets[0];
+        }
+        /*for(int i = 2; i < documentIDSets.size(); i++){
+            set_intersection(documentIDSets[i].begin(), documentIDSets[i].end(), documentIDSets.begin(), documentIDSets.end(), inserter(intersection, intersection.begin()));
+        }*/
+
+        // filter the searchResults array based on the union of the document ID
+        for(auto searchResult: searchResults) {
+            // loop through each search result
+            for (auto docIdAndTf: searchResult->invertedTermFreq) {
+                // determine if the current document ID is in the union
+                if(unionResult.find(docIdAndTf.first) != unionResult.end()) { // only add the search result to the query result data if the documentID is in the documentIDSets
+                    QueryResultData queryResultData;
+                    queryResultData.documentId = docIdAndTf.first;
+                    queryResultData.tf = docIdAndTf.second;
+                    queryResultData.idf = searchResult->idf;
+                    queryResultData.weight = queryResultData.tf * queryResultData.idf;
+                    queryResultData.publicationDate = this->indexHandler->metaDataMap[docIdAndTf.first].publicationDate;
+                    queryResultData.title = this->indexHandler->metaDataMap[docIdAndTf.first].title;
+                    // abstract and authors
+                    queryResultData.authorString = this->indexHandler->metaDataMap[docIdAndTf.first].author;
+                    queryResultData.abstract = this->indexHandler->metaDataMap[docIdAndTf.first].abstract;
+                    bool isInsert = true;
+                    // go through existing result set
+                    for(auto d : queryResultSet) {
+                        // if the document id already exist in the result set
+                        if (d ==  queryResultData.documentId) {
+                            // check if the weight of existing element is < than the new weight
+                            if (d.weight < queryResultData.weight) {
+                                // assign th bigger weight to exiting element.
+                                d.weight = queryResultData.weight;
+                            }
+                            isInsert = false;
+                            break;
+                        }
+                    }
+                    if (isInsert)
+                        queryResultSet.insert(queryResultData);
+                }
+            }
+        }
+    }
+
     else if(logicOp.compare("NONE") == 0 && excludedWords.size() == 0 && authors.size() == 0){ // single keyword scenario
         string singleKeyword = searchWords[0];
         preprocess(singleKeyword);
         // search index
         IndexNodeData* singleKeywordSearchResults = this->indexHandler->searchByKeyword(singleKeyword);
 
+        if(singleKeywordSearchResults == nullptr){
+            cout << "SINGLE KEYWORD FOR NONE IS NULL OH NO" << endl;
+        }
         // combine QueryResultData
         for(auto docIdAndTf: singleKeywordSearchResults->invertedTermFreq){
             QueryResultData queryResultData;
