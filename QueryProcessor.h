@@ -22,6 +22,8 @@ public:
     set<QueryResultData> search(string logicOp, vector<string> searchWords, vector<string> excludedWords, vector<string> authors);
     vector<string>* parseQueryString(const string &queryString);
 
+    inline void searchKeywordIndex(const vector<string> &searchWords, vector<IndexNodeData*> &searchResults, vector<set<string>> &documentIDSets);
+
     void preprocess(string &input, bool shouldStem = true);
 
     const int OP = 3;

@@ -130,7 +130,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         vector<string>* parsedQuery = qP->parseQueryString(queryString);
         set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
         for(auto searchResult: searchResults){
-            cout << searchResult.weight << "  |  " << searchResult.documentId << "  |  " <<searchResult.title << endl;
+            //cout << searchResult.weight << "  |  " << searchResult.documentId << "  |  " <<searchResult.title << endl;
         }
     }
 
@@ -145,7 +145,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         vector<string>* parsedQuery = qP->parseQueryString(queryString);
         set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
         for(auto searchResult: searchResults){
-            //cout << searchResult.weight << "  |  " << searchResult.documentId << "  |  " <<searchResult.title << endl;
+            cout << searchResult.weight << "  |  " << searchResult.documentId << "  |  " <<searchResult.title << endl;
         }
     }
 }
