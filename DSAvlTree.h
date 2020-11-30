@@ -13,25 +13,36 @@ public:
     DSAvlTree() {
         this->root = nullptr;
     }
+    ~DSAvlTree() {
+        // delete roots in post order traversal
+        this->deleteNode(this->root);
+        this->root = nullptr;
+    }
     void insert(const T &x) {
         this->insert(x, this->root);
     }
 
     DSAvlNode<T> *search(T data) {
+        if (this->root == nullptr) {
+            return nullptr;
+        }
         return search(data, this->root);
     }
 
     int height() {
+        if (this->root == nullptr) {
+            return 0;
+        }
         return this->root->height;
     }
 
     int count() {
+        if (this->root == nullptr) {
+            return 0;
+        }
         return count(this->root);
     }
 
-    DSAvlNode<T> returnRoot(){
-        return *this->root;
-    }
 private:
     DSAvlNode<T> *root;
 
@@ -42,6 +53,14 @@ private:
     void doubleWithLeftChild(DSAvlNode<T>* &k3);
     DSAvlNode<T> *search(T data, DSAvlNode<T> * &c);
     int count(DSAvlNode<T> * &t);
+
+    void deleteNode(DSAvlNode<T> *c) {
+        if (c!= nullptr) {
+            deleteNode(c->left);
+            deleteNode(c->right);
+            delete c;
+        }
+    }
 
     void preOrder(DSAvlNode<T> *c) {
         if (c!= nullptr) {

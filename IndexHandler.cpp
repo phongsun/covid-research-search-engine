@@ -7,43 +7,84 @@
 IndexHandler::IndexHandler(const string &corpusPath){
     this->corpusPath = corpusPath;
     this->metaDataMap = loadMetaData(corpusPath);
-
+    this->keyWordIndex = nullptr;
+    this->authorIndex = nullptr;
 }
 
-int IndexHandler::createIndex(){
+void IndexHandler::clearIndex() {
+    if (this->keyWordIndex != nullptr) {
+        delete this->keyWordIndex;
+        this->keyWordIndex = nullptr;
+    }
+    if (this->authorIndex != nullptr) {
+        delete this->authorIndex;
+        this->authorIndex = nullptr;
+    }
+    // delete the persistent indices
+
     this->totalArticlesIndexed = 0;
     this->avgWordsIndexedPerArticle = 0;
     this->topStemmed50WordsData.clear();
     this->top50OriginalWordsData.clear();
     this->totalWordsIndexed =  0;
     this->totalUniqueAuthors = 0;
+}
+
+int IndexHandler::createIndex(){
+    this->clearIndex();
 
     DocumentParser documentParser = DocumentParser(this->corpusPath, this->stopWordFile, this->metaDataMap);
     documentParser.maxFilesToLoad = this->maxFilesToLoad;
-    documentParser.parse(this->keyWordIndex);
+
+    this->keyWordIndex = new DSAvlTree<IndexNodeData>();
+    this->authorIndex = new DSHashTable<string, unordered_set<string>>();
+    documentParser.parse(this->keyWordIndex, this->authorIndex);
 
     this->totalArticlesIndexed = documentParser.totalFilesLoaded;
     this->avgWordsIndexedPerArticle = documentParser.avgKeyWordsIndexedPerArticle;
     this->topStemmed50WordsData = documentParser.top50StemmedWords;
     this->top50OriginalWordsData = documentParser.top50OriginalWords;
     this->totalUniqueAuthors = documentParser.totalUniqueAuthors;
-    this->totalWordsIndexed =  this->keyWordIndex.count();
-    return this->keyWordIndex.count();
+    this->totalWordsIndexed =  this->keyWordIndex->count();
+
+    return this->totalWordsIndexed;
 }
 
 IndexNodeData* IndexHandler::searchByKeyword(const string &keyWord){
+    if (this->keyWordIndex == nullptr) {
+        cout << "The Keyword Index is empty. ";
+        return nullptr;
+    }
+
     IndexNodeData searchQuery;
     searchQuery.keyWord = keyWord;
-    DSAvlNode<IndexNodeData> *node = this->keyWordIndex.search(searchQuery);
+    DSAvlNode<IndexNodeData> *node = this->keyWordIndex->search(searchQuery);
     if(node == nullptr){ // no result found
         return nullptr;
     }else {
         node->element.calculateIdf(this->totalArticlesIndexed);
         return &node->element;
     }
-
 }
 
+unordered_set<string> IndexHandler::searchByAuthor(const string &author){
+    unordered_set<string> documentIdList;
+    if (this->authorIndex == nullptr) {
+        cout << "The Author Index is empty. ";
+        return documentIdList;
+    }
+
+    pair<string, unordered_set<string>> invertedDocumentIdsByAuthor;
+    DSHashTable<string, unordered_set<string>>::Iterator iter = this->authorIndex->find(author);
+    if (iter == authorIndex->end()) { // author is not in hashtable, create the index entry
+        return documentIdList;
+
+    } else { // author is in hashtable, get index entry from hashtable
+        invertedDocumentIdsByAuthor = *iter;
+        documentIdList = invertedDocumentIdsByAuthor.second;
+        return documentIdList;
+    }
+}
 
 unordered_map<string, ArticleMetaData> IndexHandler::loadMetaData(const string &corpusPath){
     unordered_map<string, ArticleMetaData> metaDataMap;

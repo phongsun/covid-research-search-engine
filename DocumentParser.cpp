@@ -11,7 +11,7 @@ DocumentParser::DocumentParser(const string &corpusPath, const string &stopwordP
     this->metaDataMap = metaDataMap;
 }
 
-void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
+void DocumentParser::parse(DSAvlTree<IndexNodeData>* keywordIndex, DSHashTable<string, unordered_set<string>> *authorIndex){
     int numberOfKeyWordsForArcticles = 0;
 
     this->totalFilesLoaded = 0;
@@ -78,6 +78,8 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
                     transform(lastName.begin(), lastName.end(), lastName.begin(), ::tolower);
                     transform(firstName.begin(), firstName.end(), firstName.begin(), ::tolower);
                     articleData.authorLastNames.insert(lastName);
+
+                    // building unique user name stats
                     string fullName = lastName+", "+firstName;
                     uniqueAuthorCount[fullName]++;
                 }
@@ -133,9 +135,9 @@ void DocumentParser::parse(DSAvlTree<IndexNodeData> &keywordIndex){
                 // calculate the sum of number of keywords for each article
                 numberOfKeyWordsForArcticles += articleData.keyWordList.size();
                 // 21. all the data are parsed and collected in the articleData
-                // add it to the AvlTree - keywordIndex
+                // add it to the AvlTree - keywordIndex and DSHashtable - authorIndex
                 this->addArticleToKeywordIndex(keywordIndex, articleData);
-
+                this->addAuthorsToHashTable(authorIndex, articleData);
             } else { // no documentID is not full-text
                 ;
             }
@@ -210,30 +212,49 @@ inline unordered_set<string> DocumentParser::loadStopWords(const string &filePat
     return stopWords;
 }
 
-inline void DocumentParser::addArticleToKeywordIndex(DSAvlTree<IndexNodeData> &avlTree, const ArticleData &articleData){
+inline void DocumentParser::addArticleToKeywordIndex(DSAvlTree<IndexNodeData> *avlTree, const ArticleData &articleData){
     unsigned int noOfWordsInArticle = articleData.keyWordList.size();
     // 22. loop through all the elements in the articleData.keyWordList
     for(auto keyWordAndFreq: articleData.keyWordList){
         // 23. calculate TF for each word
         // multiplied by 100000 to make the termFreq an accurate int
-        unsigned int termFreq = (keyWordAndFreq.second * 100000) / noOfWordsInArticle;
+        unsigned int termFreq = (keyWordAndFreq.second * 10000) / noOfWordsInArticle;
 
         // 24. search if the key word already in the AvlTree
         IndexNodeData keyWordNodeData;
         keyWordNodeData.keyWord = keyWordAndFreq.first;
-        DSAvlNode<IndexNodeData> *node = avlTree.search(keyWordNodeData);
+        DSAvlNode<IndexNodeData> *node = avlTree->search(keyWordNodeData);
 
         // 25. if not, create a IndexNodeData object with inverted TF by document id
         // insert the IndexNodeData into the AvlTree
         if(node == nullptr){ // keyword doesn't exist in the avlTree
             keyWordNodeData.invertedTermFreq[articleData.documentID] = termFreq;
             // insert the new data because the keyword wasn't in the tree yet
-            avlTree.insert(keyWordNodeData);
+            avlTree->insert(keyWordNodeData);
         }else{
             // 26. Keyword already exist in the tree, add TF for the document id to the node for the keyword.
             node->element.invertedTermFreq[articleData.documentID] = termFreq;
         }
     }
+}
 
-    this->finalIndex = avlTree;
+inline void DocumentParser::addAuthorsToHashTable(DSHashTable<string, unordered_set<string>> *authorIndex, const ArticleData &input) {
+    pair<string, unordered_set<string>> invertedDocumentIdsByAuthor;
+    for (auto author: input.authorLastNames) {
+        unordered_set<string> documentIdList;
+        DSHashTable<string, unordered_set<string>>::Iterator iter = authorIndex->find(author);
+        if (iter == authorIndex->end()) { // author is not in hashtable, create the index entry
+            documentIdList.insert(input.documentID);
+            // create a new hashtable entry
+            invertedDocumentIdsByAuthor = pair<string, unordered_set<string>>(author, documentIdList);
+
+        } else { // author is in hashtable, get index entry from hashtable
+            invertedDocumentIdsByAuthor = *iter;
+            // add title of this paper to the hashtable entry
+            invertedDocumentIdsByAuthor.second.insert(input.documentID);
+            authorIndex->erase(
+                    author); // erase the current entry so we can insert a new entry for the same key
+        }
+        authorIndex->insert(invertedDocumentIdsByAuthor);
+    }
 }

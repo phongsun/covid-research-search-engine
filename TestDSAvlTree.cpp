@@ -65,4 +65,15 @@ TEST_CASE("DSAvlTree", "[DSAvlTree]"){
         REQUIRE(testTree.search(35)->right == NULL);
         REQUIRE(testTree.search(35)->height == 0);
     }
+
+    SECTION("Delete tree") {
+        int dataList[11] = {10, 20, 30, 25, 22, 4, 6, 35, 21, 23, 24};
+        DSAvlTree<int> *testTree = new DSAvlTree<int>();
+
+        // insert everything from dataList to the AVL tree called testTree
+        for (int i = 0; i < 11; i++) {
+            testTree->insert(dataList[i]);
+        }
+        delete testTree;
+    }
 }

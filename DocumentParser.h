@@ -15,6 +15,8 @@
 #include "ArticleData.h"
 #include "porter2_stemmer.h"
 #include "DSAvlTree.h"
+#include "DSHashTable.h"
+
 #include "IndexNodeData.h"
 #include "ArticleMetaData.h"
 
@@ -23,14 +25,13 @@ using namespace std;
 class DocumentParser {
 public:
     DocumentParser(const string &corpusPath, const string &stopwordPath, const unordered_map<string, ArticleMetaData> &metaDataMap);
-    void parse(DSAvlTree<IndexNodeData> &keywordIndex);
+    void parse(DSAvlTree<IndexNodeData> *keywordIndex, DSHashTable<string, unordered_set<string>> *authorIndex);
     inline unordered_set<string> loadStopWords(const string &filePath);
-    inline void addArticleToKeywordIndex(DSAvlTree<IndexNodeData> &avlTree, const ArticleData &articleData);
-    DSAvlTree<IndexNodeData> finalIndex;
+    inline void addArticleToKeywordIndex(DSAvlTree<IndexNodeData> *avlTree, const ArticleData &articleData);
+    inline void addAuthorsToHashTable(DSHashTable<string, unordered_set<string>> *authorIndex, const ArticleData &input);
 
     string corpusPath;
     string stopwordPath;
-    string metaDataFileName;
 
     unordered_map<string, ArticleMetaData> metaDataMap; // constains full text articles and publishing time
 

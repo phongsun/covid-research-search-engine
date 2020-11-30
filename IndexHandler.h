@@ -18,6 +18,10 @@ public:
     IndexHandler(const string &corpusPath);
     int createIndex();
     IndexNodeData* searchByKeyword(const string &keyWord);
+    unordered_set<string> searchByAuthor(const string &author);
+
+    void clearIndex();
+
     unordered_map<string, ArticleMetaData> metaDataMap;
 
     int maxFilesToLoad = -1;
@@ -30,7 +34,9 @@ public:
     std::vector<std::pair<int,string>> topStemmed50WordsData;
     std::vector<std::pair<int,string>> top50OriginalWordsData;
 private:
-    DSAvlTree<IndexNodeData> keyWordIndex;
+    DSAvlTree<IndexNodeData>* keyWordIndex;
+    DSHashTable<string, unordered_set<string>> *authorIndex;
+
     unordered_map<string, ArticleMetaData> loadMetaData(const string &corpusPath);
     string corpusPath;
     const string stopWordFile = "./stop_words.txt";
