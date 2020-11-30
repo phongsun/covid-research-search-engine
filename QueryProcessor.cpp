@@ -36,6 +36,58 @@ inline void QueryProcessor::searchKeywordIndex(const vector<string> &searchWords
     }
 }
 
+inline void QueryProcessor::buildQueryResult(const vector<IndexNodeData*> &searchResults,
+                             const set<string> &intersectionList,
+                             const set<string> &unionList,
+                             const set<string> &authors,
+                             const set<string> &excludedWords,
+                             set<QueryResultData> &queryResultSet){
+
+    // filter the searchResults array based on the union of the document ID
+    for(auto searchResult: searchResults) {
+        // loop through each search result
+        for (auto docIdAndTf: searchResult->invertedTermFreq) {
+            // determine if the current document ID is in the intersection
+            if ((intersectionList.size() > 0 && (intersectionList.find(docIdAndTf.first) != intersectionList.end()))
+                ||
+                (unionList.size() > 0 && (unionList.find(docIdAndTf.first) != unionList.end()))
+                ||
+                (excludedWords.size() > 0 && (excludedWords.find(docIdAndTf.first) == excludedWords.end()))
+                ||
+                (intersectionList.size() == 0 && unionList.size() == 0) // single keyword search
+                )
+                { // only add the search result to the query result data if the documentID is in the documentIDSets
+                QueryResultData queryResultData;
+                queryResultData.documentId = docIdAndTf.first;
+                queryResultData.tf = docIdAndTf.second;
+                queryResultData.idf = searchResult->idf;
+                queryResultData.weight = queryResultData.tf * queryResultData.idf;
+                queryResultData.publicationDate = this->indexHandler->metaDataMap[docIdAndTf.first].publicationDate;
+                queryResultData.title = this->indexHandler->metaDataMap[docIdAndTf.first].title;
+                // abstract and authors
+                queryResultData.authorString = this->indexHandler->metaDataMap[docIdAndTf.first].author;
+                queryResultData.abstract = this->indexHandler->metaDataMap[docIdAndTf.first].abstract;
+                bool isInsert = true;
+                // go through existing result set
+                for(auto d : queryResultSet) {
+                    // if the document id already exist in the result set
+                    if (d ==  queryResultData.documentId) {
+                        // check if the weight of existing element is < than the new weight
+                        if (d.weight < queryResultData.weight) {
+                            // assign th bigger weight to exiting element.
+                            d.weight = queryResultData.weight;
+                        }
+                        isInsert = false;
+                        break;
+                    }
+                }
+                if (isInsert)
+                    queryResultSet.insert(queryResultData);
+            }
+        }
+    }
+}
+
 set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searchWords, vector<string> excludedWords, vector<string> authors){
     set<QueryResultData> queryResultSet;
     bool shouldExclude;
@@ -43,7 +95,8 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
         shouldExclude = false;
     }
 
-    set<string> exclusionList;
+    // set of exclusion document IDs
+    set<string> exclusionResult;
     if(excludedWords.size() > 0){
 
     }
@@ -52,6 +105,12 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
     vector<IndexNodeData*> searchResults;
     // set of the document IDs for each search result
     vector<set<string>> documentIDSets;
+    // set that stores the intersectionResult of all of the documentIDSets
+    set<string> unionResult;
+    // set that stores the intersectionResult of all of the documentIDSets
+    set<string> intersectionResult;
+    // set that stores the list of documentIDs for author search
+    set<string> authorResult;
 
     if(searchWords.size() > 0) {
         this->searchKeywordIndex(searchWords, searchResults, documentIDSets);
@@ -59,8 +118,6 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
 
     // if the logic operator is AND
     if(logicOp.compare("AND") == 0){
-        // set that stores the intersection of all of the documentIDSets
-        set<string> intersection;
 
         if (searchResults.size() == 0) {
             return queryResultSet;
@@ -78,17 +135,17 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
                 set_intersection(documentIDSets[i].begin(), documentIDSets[i].end(), prevIntersection.begin(), prevIntersection.end(), inserter(curIntersection, curIntersection.begin()));
                 tmpIntersectionList.push_back(curIntersection);
             }
-            intersection = *(tmpIntersectionList.end() - 1);
+            intersectionResult = *(tmpIntersectionList.end() - 1);
         } else { // only one search result
-            intersection = documentIDSets[0];
+            intersectionResult = documentIDSets[0];
         }
 
         // filter the searchResults array based on the union of the document ID
         for(auto searchResult: searchResults) {
             // loop through each search result
             for (auto docIdAndTf: searchResult->invertedTermFreq) {
-                // determine if the current document ID is in the intersection
-                if(intersection.find(docIdAndTf.first) != intersection.end()) { // only add the search result to the query result data if the documentID is in the documentIDSets
+                // determine if the current document ID is in the intersectionResult
+                if(intersectionResult.find(docIdAndTf.first) != intersectionResult.end()) { // only add the search result to the query result data if the documentID is in the documentIDSets
                     QueryResultData queryResultData;
                     queryResultData.documentId = docIdAndTf.first;
                     queryResultData.tf = docIdAndTf.second;
@@ -121,8 +178,6 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
     }
 
     else if(logicOp.compare("OR") == 0){
-        // set that stores the intersection of all of the documentIDSets
-        set<string> unionResult;
 
 
         if (searchResults.size() == 0) { // if no results found
@@ -137,44 +192,10 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
             unionResult = documentIDSets[0];
         }
         /*for(int i = 2; i < documentIDSets.size(); i++){
-            set_intersection(documentIDSets[i].begin(), documentIDSets[i].end(), documentIDSets.begin(), documentIDSets.end(), inserter(intersection, intersection.begin()));
+            set_intersection(documentIDSets[i].begin(), documentIDSets[i].end(), documentIDSets.begin(), documentIDSets.end(), inserter(intersectionResult, intersectionResult.begin()));
         }*/
 
-        // filter the searchResults array based on the union of the document ID
-        for(auto searchResult: searchResults) {
-            // loop through each search result
-            for (auto docIdAndTf: searchResult->invertedTermFreq) {
-                // determine if the current document ID is in the union
-                if(unionResult.find(docIdAndTf.first) != unionResult.end()) { // only add the search result to the query result data if the documentID is in the documentIDSets
-                    QueryResultData queryResultData;
-                    queryResultData.documentId = docIdAndTf.first;
-                    queryResultData.tf = docIdAndTf.second;
-                    queryResultData.idf = searchResult->idf;
-                    queryResultData.weight = queryResultData.tf * queryResultData.idf;
-                    queryResultData.publicationDate = this->indexHandler->metaDataMap[docIdAndTf.first].publicationDate;
-                    queryResultData.title = this->indexHandler->metaDataMap[docIdAndTf.first].title;
-                    // abstract and authors
-                    queryResultData.authorString = this->indexHandler->metaDataMap[docIdAndTf.first].author;
-                    queryResultData.abstract = this->indexHandler->metaDataMap[docIdAndTf.first].abstract;
-                    bool isInsert = true;
-                    // go through existing result set
-                    for(auto d : queryResultSet) {
-                        // if the document id already exist in the result set
-                        if (d ==  queryResultData.documentId) {
-                            // check if the weight of existing element is < than the new weight
-                            if (d.weight < queryResultData.weight) {
-                                // assign th bigger weight to exiting element.
-                                d.weight = queryResultData.weight;
-                            }
-                            isInsert = false;
-                            break;
-                        }
-                    }
-                    if (isInsert)
-                        queryResultSet.insert(queryResultData);
-                }
-            }
-        }
+        buildQueryResult(searchResults, intersectionResult, unionResult, authorResult, exclusionResult, queryResultSet);
     }
 
     else if(logicOp.compare("NONE") == 0 && excludedWords.size() == 0 && authors.size() == 0){ // single keyword scenario

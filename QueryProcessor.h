@@ -24,6 +24,13 @@ public:
 
     inline void searchKeywordIndex(const vector<string> &searchWords, vector<IndexNodeData*> &searchResults, vector<set<string>> &documentIDSets);
 
+    inline void buildQueryResult(const vector<IndexNodeData*> &searchResults,
+                                 const set<string> &intersectionList,
+                                 const set<string> &unionList,
+                                 const set<string> &authors,
+                                 const set<string> &excludedWords,
+                                 set<QueryResultData> &queryResultSet);
+
     void preprocess(string &input, bool shouldStem = true);
 
     const int OP = 3;
