@@ -110,7 +110,6 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
 
         }*/
         string queryString = "congestion";
-        ih->searchByKeyword(queryString);
         QueryProcessor *qP = new QueryProcessor(ih);
         vector<string>* parsedQuery = qP->parseQueryString(queryString);
         set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
@@ -125,7 +124,6 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         ih->createIndex();
 
         string queryString = "AND cell covid patients inflame Pediatric";
-        ih->searchByKeyword(queryString);
         QueryProcessor *qP = new QueryProcessor(ih);
         vector<string>* parsedQuery = qP->parseQueryString(queryString);
         set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
@@ -140,12 +138,68 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         ih->createIndex();
 
         string queryString = "OR covid congestion";
-        ih->searchByKeyword(queryString);
         QueryProcessor *qP = new QueryProcessor(ih);
         vector<string>* parsedQuery = qP->parseQueryString(queryString);
         set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
         for(auto searchResult: searchResults){
             cout << searchResult.weight << "  |  " << searchResult.documentId << "  |  " <<searchResult.title << endl;
         }
+    }
+
+    SECTION("Search single NOT"){
+        IndexHandler *ih = new IndexHandler("../test_data");
+        ih->createIndex();
+
+        /*cout << "------ " << ih->totalArticlesIndexed << endl;
+        cout << "------ " << ih->avgWordsIndexedPerArticle << endl;
+        cout << "-----" << ih->totalWordsIndexed << endl;
+        int i = 0;
+        for (int i = 0; i < 50; i++) {
+
+            cout << ih->top50OriginalWordsData[i].first << " - " << ih->top50OriginalWordsData[i].second << " ^^^";
+            cout << ih->topStemmed50WordsData[i].first << " + " << ih->topStemmed50WordsData[i].second << endl;
+
+        }*/
+        QueryProcessor *qP = new QueryProcessor(ih);
+        vector<string>* parsedQuery = qP->parseQueryString("cell");
+        set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 75);
+
+        parsedQuery = qP->parseQueryString("cell NOT covid");
+        searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 71);
+
+    }
+
+    SECTION("OR NOT"){
+        IndexHandler *ih = new IndexHandler("../test_data");
+        // load files into the index
+        ih->createIndex();
+
+        string queryString = "OR cell congestion";
+        QueryProcessor *qP = new QueryProcessor(ih);
+        vector<string>* parsedQuery = qP->parseQueryString(queryString);
+        set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 76);
+
+        parsedQuery = qP->parseQueryString("OR cell congestion NOT covid");
+        searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 72);
+    }
+
+    SECTION("OR NOT"){
+        IndexHandler *ih = new IndexHandler("../test_data");
+        // load files into the index
+        ih->createIndex();
+
+        string queryString = "AND covid vaccine";
+        QueryProcessor *qP = new QueryProcessor(ih);
+        vector<string>* parsedQuery = qP->parseQueryString(queryString);
+        set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 37);
+
+        parsedQuery = qP->parseQueryString("AND covid vaccine NOT cell");
+        searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 11);
     }
 }
