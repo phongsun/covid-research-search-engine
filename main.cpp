@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
     if(node == nullptr){
         cout << "Not found" << endl;
     }else{
-        for(auto titleAndFreq : node->element.invertedTermFreq){
+        for(auto titleAndFreq : node->element.invertedWordFreq){
             //cout <<  "The word \"" << searchPhrase << "\" appears " << titleAndFreq.second << " times in article ID \"" << titleAndFreq.first << "\"" <<endl;
             //cout << titleAndFreq.first << endl;
         }

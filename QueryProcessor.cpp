@@ -29,7 +29,7 @@ inline void QueryProcessor::searchKeywordIndex(const vector<string> &searchWords
     // create a set of document IDs for each result
     for (auto searchResult: searchResults) {
         set<string> documentIDSet;
-        for (auto docIDAndTP: searchResult->invertedTermFreq) {
+        for (auto docIDAndTP: searchResult->invertedWordFreq) {
             documentIDSet.insert(docIDAndTP.first);
         }
         documentIDSets.push_back(documentIDSet);
@@ -56,11 +56,11 @@ inline void QueryProcessor::buildQueryResult(const vector<IndexNodeData*> &searc
                              const set<string> &authorDocumentIDList,
                              const set<string> &excludedWords,
                              set<QueryResultData> &queryResultSet){
-
     // filter the searchResults array based on the union of the document ID
     for(auto searchResult: searchResults) {
         // loop through each search result
-        for (auto docIdAndTf: searchResult->invertedTermFreq) {
+        int numberOfArticles = searchResult->invertedWordFreq.size();
+        for (auto docIdAndTf: searchResult->invertedWordFreq) {
             // determine if the current document ID is in the intersection
             if ((intersectionList.size() > 0 && (intersectionList.find(docIdAndTf.first) != intersectionList.end())) // AND
                 ||
@@ -73,11 +73,13 @@ inline void QueryProcessor::buildQueryResult(const vector<IndexNodeData*> &searc
                 if (authorDocumentIDList.size() == 0 || (authorDocumentIDList.find(docIdAndTf.first) != authorDocumentIDList.end())) {
                     // if the document ID is not in the exclusion list, then it can be part of the results
                     if (excludedWords.size() == 0 || (excludedWords.find(docIdAndTf.first) == excludedWords.end())) {
+
                         QueryResultData queryResultData;
                         queryResultData.documentId = docIdAndTf.first;
-                        queryResultData.tf = docIdAndTf.second;
+                        queryResultData.wc = docIdAndTf.second;
                         queryResultData.idf = searchResult->idf;
-                        queryResultData.weight = queryResultData.tf * queryResultData.idf;
+                        double tf = (double)queryResultData.wc/(double)numberOfArticles;
+                        queryResultData.weight =  tf * queryResultData.idf;
                         queryResultData.publicationDate = this->indexHandler->metaDataMap[docIdAndTf.first].publicationDate;
                         queryResultData.title = this->indexHandler->metaDataMap[docIdAndTf.first].title;
                         // abstract and authorDocumentIDList

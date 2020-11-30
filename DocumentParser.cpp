@@ -218,7 +218,7 @@ inline void DocumentParser::addArticleToKeywordIndex(DSAvlTree<IndexNodeData> *a
     for(auto keyWordAndFreq: articleData.keyWordList){
         // 23. calculate TF for each word
         // multiplied by 100000 to make the termFreq an accurate int
-        unsigned int termFreq = (keyWordAndFreq.second * 10000) / noOfWordsInArticle;
+        unsigned int termFreq = keyWordAndFreq.second;
 
         // 24. search if the key word already in the AvlTree
         IndexNodeData keyWordNodeData;
@@ -228,12 +228,12 @@ inline void DocumentParser::addArticleToKeywordIndex(DSAvlTree<IndexNodeData> *a
         // 25. if not, create a IndexNodeData object with inverted TF by document id
         // insert the IndexNodeData into the AvlTree
         if(node == nullptr){ // keyword doesn't exist in the avlTree
-            keyWordNodeData.invertedTermFreq[articleData.documentID] = termFreq;
+            keyWordNodeData.invertedWordFreq[articleData.documentID] = termFreq;
             // insert the new data because the keyword wasn't in the tree yet
             avlTree->insert(keyWordNodeData);
         }else{
             // 26. Keyword already exist in the tree, add TF for the document id to the node for the keyword.
-            node->element.invertedTermFreq[articleData.documentID] = termFreq;
+            node->element.invertedWordFreq[articleData.documentID] = termFreq;
         }
     }
 }

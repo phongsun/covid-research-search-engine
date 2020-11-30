@@ -22,9 +22,9 @@ public:
     bool operator== (const string& documentId) const;
     string keyword;
     string documentId;
-    unsigned int tf = 0;
-    unsigned int idf = 0;
-    u_int64_t weight = 0;
+    unsigned int wc = 0;
+    double idf = 0;
+    double weight = 0;
     string publicationDate;
     string title;
     string authorString;

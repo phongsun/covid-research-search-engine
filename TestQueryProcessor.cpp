@@ -124,9 +124,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         QueryProcessor *qP = new QueryProcessor(ih);
         vector<string>* parsedQuery = qP->parseQueryString(queryString);
         set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
-        for(auto searchResult: searchResults){
-            //cout <<searchResult.weight << "  |  "<<searchResult.idf << "  |  " <<searchResult.tf << "  |  " << searchResult.documentId << "  |  " <<searchResult.title << endl;
-        }
+        REQUIRE(searchResults.size() == 4);
     }
 
     SECTION("Search with AND only"){
@@ -138,9 +136,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         QueryProcessor *qP = new QueryProcessor(ih);
         vector<string>* parsedQuery = qP->parseQueryString(queryString);
         set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
-        for(auto searchResult: searchResults){
-            //cout << searchResult.weight << "  |  " << searchResult.documentId << "  |  " <<searchResult.title << endl;
-        }
+        REQUIRE(searchResults.size() == 1);
     }
 
     SECTION("Search with OR only"){
@@ -152,25 +148,13 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         QueryProcessor *qP = new QueryProcessor(ih);
         vector<string>* parsedQuery = qP->parseQueryString(queryString);
         set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
-        /*for(auto searchResult: searchResults){
-            cout << searchResult.weight << "  |  " << searchResult.documentId << "  |  " <<searchResult.title << endl;
-        }*/
+        REQUIRE(searchResults.size() == 14);
     }
 
     SECTION("Search single NOT"){
         IndexHandler *ih = new IndexHandler("../test_data");
         ih->createIndex();
 
-        /*cout << "------ " << ih->totalArticlesIndexed << endl;
-        cout << "------ " << ih->avgWordsIndexedPerArticle << endl;
-        cout << "-----" << ih->totalWordsIndexed << endl;
-        int i = 0;
-        for (int i = 0; i < 50; i++) {
-
-            cout << ih->top50OriginalWordsData[i].first << " - " << ih->top50OriginalWordsData[i].second << " ^^^";
-            cout << ih->topStemmed50WordsData[i].first << " + " << ih->topStemmed50WordsData[i].second << endl;
-
-        }*/
         QueryProcessor *qP = new QueryProcessor(ih);
         vector<string>* parsedQuery = qP->parseQueryString("cell");
         set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
@@ -180,6 +164,9 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
         REQUIRE(searchResults.size() == 71);
 
+        /*for (auto r: searchResults) {
+            cout << r.weight << " |" << r.publicationDate << endl;
+        }*/
     }
 
     SECTION("OR NOT"){

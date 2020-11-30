@@ -34,8 +34,8 @@ bool IndexNodeData::operator> (const IndexNodeData& rhs) const{
 
 void IndexNodeData::calculateIdf(unsigned int totalArticlesIndexed) {
     //IDF(t) = log_e(Total number of documents / Number of documents with term t in it).
-    int numberOfDocumentsForKeyWord = this->invertedTermFreq.size();
+    int numberOfDocumentsForKeyWord = this->invertedWordFreq.size();
     double ratio = ((double)totalArticlesIndexed)/((double)numberOfDocumentsForKeyWord);
-    double result = (log(ratio) * (double)10000); // increase resolution of the integer result by x 100
-    this->idf = (int) result;
+    double result = log(ratio); // increase resolution of the integer result by x 100
+    this->idf =  result;
 }
