@@ -120,10 +120,11 @@ unordered_map<string, ArticleMetaData> IndexHandler::loadMetaData(const string &
             }
             result.push_back(string(mystart));   // last field delimited by end of line instead of comma
             ArticleMetaData metaData;
-            metaData.publicationDate = result[9];
+            metaData.datePublished = result[9];
             metaData.author = result[10];
             metaData.title = result[3];
             metaData.abstract = result[8];
+            metaData.publicationDOI = result[4];
 
             metaDataMap[result[1]] = metaData;
         }

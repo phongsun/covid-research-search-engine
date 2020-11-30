@@ -80,8 +80,9 @@ inline void QueryProcessor::buildQueryResult(const vector<IndexNodeData*> &searc
                         queryResultData.idf = searchResult->idf;
                         double tf = (double)queryResultData.wc/(double)numberOfArticles;
                         queryResultData.weight =  tf * queryResultData.idf;
-                        queryResultData.publicationDate = this->indexHandler->metaDataMap[docIdAndTf.first].publicationDate;
+                        queryResultData.datePublished = this->indexHandler->metaDataMap[docIdAndTf.first].datePublished;
                         queryResultData.title = this->indexHandler->metaDataMap[docIdAndTf.first].title;
+                        queryResultData.publicationDOI = this->indexHandler->metaDataMap[docIdAndTf.first].publicationDOI;
                         // abstract and authorDocumentIDList
                         queryResultData.authorString = this->indexHandler->metaDataMap[docIdAndTf.first].author;
                         queryResultData.abstract = this->indexHandler->metaDataMap[docIdAndTf.first].abstract;

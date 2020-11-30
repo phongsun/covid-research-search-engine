@@ -25,7 +25,8 @@ public:
     unsigned int wc = 0;
     double idf = 0;
     double weight = 0;
-    string publicationDate;
+    string datePublished;
+    string publicationDOI; // Digital Object ID for the publication
     string title;
     string authorString;
     string abstract;

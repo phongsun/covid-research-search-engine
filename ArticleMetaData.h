@@ -13,7 +13,8 @@ public:
     string title;
     string author;
     string abstract;
-    string publicationDate;
+    string datePublished;
+    string publicationDOI; // Digital Object Identifier for the publication
 };
 
 
