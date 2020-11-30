@@ -140,41 +140,12 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
             intersectionResult = documentIDSets[0];
         }
 
-        // filter the searchResults array based on the union of the document ID
-        for(auto searchResult: searchResults) {
-            // loop through each search result
-            for (auto docIdAndTf: searchResult->invertedTermFreq) {
-                // determine if the current document ID is in the intersectionResult
-                if(intersectionResult.find(docIdAndTf.first) != intersectionResult.end()) { // only add the search result to the query result data if the documentID is in the documentIDSets
-                    QueryResultData queryResultData;
-                    queryResultData.documentId = docIdAndTf.first;
-                    queryResultData.tf = docIdAndTf.second;
-                    queryResultData.idf = searchResult->idf;
-                    queryResultData.weight = queryResultData.tf * queryResultData.idf;
-                    queryResultData.publicationDate = this->indexHandler->metaDataMap[docIdAndTf.first].publicationDate;
-                    queryResultData.title = this->indexHandler->metaDataMap[docIdAndTf.first].title;
-                    // abstract and authors
-                    queryResultData.authorString = this->indexHandler->metaDataMap[docIdAndTf.first].author;
-                    queryResultData.abstract = this->indexHandler->metaDataMap[docIdAndTf.first].abstract;
-                    bool isInsert = true;
-                    // go through existing result set
-                    for(auto d : queryResultSet) {
-                        // if the document id already exist in the result set
-                        if (d ==  queryResultData.documentId) {
-                            // check if the weight of existing element is < than the new weight
-                            if (d.weight < queryResultData.weight) {
-                                // assign th bigger weight to exiting element.
-                                d.weight = queryResultData.weight;
-                            }
-                            isInsert = false;
-                            break;
-                        }
-                    }
-                    if (isInsert)
-                        queryResultSet.insert(queryResultData);
-                }
-            }
-        }
+        buildQueryResult(searchResults,
+                         intersectionResult,
+                         unionResult,
+                         authorResult,
+                         exclusionResult,
+                         queryResultSet);
     }
 
     else if(logicOp.compare("OR") == 0){
@@ -210,20 +181,12 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
             return queryResultSet; // return empty result set
         }
 
-        // combine QueryResultData
-        for(auto docIdAndTf: searchResults[0]->invertedTermFreq){
-            QueryResultData queryResultData;
-            queryResultData.documentId = docIdAndTf.first;
-            queryResultData.tf = docIdAndTf.second;
-            queryResultData.idf = searchResults[0]->idf;
-            queryResultData.weight = queryResultData.tf * queryResultData.idf;
-            queryResultData.publicationDate = this->indexHandler->metaDataMap[docIdAndTf.first].publicationDate;
-            queryResultData.title = this->indexHandler->metaDataMap[docIdAndTf.first].title;
-            // abstract and authors
-            queryResultData.authorString = this->indexHandler->metaDataMap[docIdAndTf.first].author;
-            queryResultData.abstract = this->indexHandler->metaDataMap[docIdAndTf.first].abstract;
-            queryResultSet.insert(queryResultData);
-        }
+        buildQueryResult(searchResults,
+                         intersectionResult,
+                         unionResult,
+                         authorResult,
+                         exclusionResult,
+                         queryResultSet);
     }
 
 
