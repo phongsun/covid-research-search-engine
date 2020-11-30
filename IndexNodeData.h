@@ -17,6 +17,7 @@ public:
     bool operator== (const IndexNodeData& rhs) const;
     bool operator< (const IndexNodeData& rhs) const;
     bool operator> (const IndexNodeData& rhs) const;
+    string toJsonString() const; // convert the object to a json string to serialize
 
     string keyWord;
     unordered_map<string, unsigned int> invertedWordFreq;
