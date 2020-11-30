@@ -22,12 +22,17 @@ public:
     set<QueryResultData> search(string logicOp, vector<string> searchWords, vector<string> excludedWords, vector<string> authors);
     vector<string>* parseQueryString(const string &queryString);
 
-    inline void searchKeywordIndex(const vector<string> &searchWords, vector<IndexNodeData*> &searchResults, vector<set<string>> &documentIDSets);
+    inline void searchKeywordIndex(const vector<string> &searchWords,
+                                    vector<IndexNodeData*> &searchResults,
+                                    vector<set<string>> &documentIDSets);
+
+    inline void searchAuthorIndex(const vector<string> &authors,
+                                                  set<string> &documentIDSet);
 
     inline void buildQueryResult(const vector<IndexNodeData*> &searchResults,
                                  const set<string> &intersectionList,
                                  const set<string> &unionList,
-                                 const set<string> &authors,
+                                 const set<string> &authorDocumentIDList,
                                  const set<string> &excludedWords,
                                  set<QueryResultData> &queryResultSet);
 

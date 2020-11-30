@@ -102,7 +102,6 @@ TEST_CASE("IndexHandler", "IndexHandler") {
             ih->createIndex();
 
             unordered_set<string> documentIds = ih->searchByAuthor("wang");
-            cout<<"size == " << documentIds.size() << endl;
             REQUIRE(documentIds.size() == 14);
         }
     }

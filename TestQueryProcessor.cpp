@@ -40,8 +40,6 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
 
         vector<string>* testVal = queryProcessor->parseQueryString("AUTHOR robbins sun");
 
-        cout << testVal[1].size() << endl;
-
         REQUIRE(testVal[0].size() == 0);
         REQUIRE(testVal[1].size() == 2);
         REQUIRE(testVal[2].size() == 0);
@@ -49,6 +47,19 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         REQUIRE(testVal[1][0].compare("robbins") == 0);
         REQUIRE(testVal[1][1].compare("sun") == 0);
         REQUIRE(testVal[3][0].compare("NONE") == 0);
+    }
+
+    SECTION("Parsing single word with author"){
+        QueryProcessor *queryProcessor = new QueryProcessor(nullptr);
+
+        vector<string>* testVal = queryProcessor->parseQueryString("congestion AUTHOR samy");
+
+        REQUIRE(testVal[queryProcessor->KEYWORD].size() == 1);
+        REQUIRE(testVal[queryProcessor->AUTHOR].size() == 1);
+        REQUIRE(testVal[queryProcessor->EXCLUSION].size() == 0);
+        REQUIRE(testVal[queryProcessor->OP].size() == 1);
+        REQUIRE(testVal[queryProcessor->AUTHOR][0].compare("samy") == 0);
+        REQUIRE(testVal[queryProcessor->KEYWORD][0].compare("congestion") == 0);
     }
 
     SECTION("Parsing multiple keywords connected by OR"){
@@ -95,7 +106,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         REQUIRE(testVal[3][0].compare("NONE") == 0);
     }
 
-    SECTION("Search with single keyword"){
+    SECTION("Search with NONE"){
         IndexHandler *ih = new IndexHandler("../test_data");
         ih->createIndex();
 
@@ -141,9 +152,9 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         QueryProcessor *qP = new QueryProcessor(ih);
         vector<string>* parsedQuery = qP->parseQueryString(queryString);
         set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
-        for(auto searchResult: searchResults){
+        /*for(auto searchResult: searchResults){
             cout << searchResult.weight << "  |  " << searchResult.documentId << "  |  " <<searchResult.title << endl;
-        }
+        }*/
     }
 
     SECTION("Search single NOT"){
@@ -187,7 +198,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         REQUIRE(searchResults.size() == 72);
     }
 
-    SECTION("OR NOT"){
+    SECTION("AND NOT"){
         IndexHandler *ih = new IndexHandler("../test_data");
         // load files into the index
         ih->createIndex();
@@ -202,4 +213,118 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
         REQUIRE(searchResults.size() == 11);
     }
+
+    SECTION("AND AUTHOR"){
+        IndexHandler *ih = new IndexHandler("../test_data");
+        // load files into the index
+        ih->createIndex();
+
+        string queryString = "AND covid vaccine";
+        QueryProcessor *qP = new QueryProcessor(ih);
+        vector<string>* parsedQuery = qP->parseQueryString(queryString);
+        set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 37);
+
+        parsedQuery = qP->parseQueryString("AND covid vaccine AUTHOR wang");
+        searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 4);
+    }
+
+    SECTION("OR AUTHOR"){
+        IndexHandler *ih = new IndexHandler("../test_data");
+        // load files into the index
+        ih->createIndex();
+
+        string queryString = "OR cell congestion";
+        QueryProcessor *qP = new QueryProcessor(ih);
+        vector<string>* parsedQuery = qP->parseQueryString(queryString);
+        set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 76);
+
+        parsedQuery = qP->parseQueryString("OR cell congestion AUTHOR wang");
+        searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 12);
+    }
+
+    SECTION("NONE AUTHOR"){
+        IndexHandler *ih = new IndexHandler("../test_data");
+        ih->createIndex();
+
+        QueryProcessor *qP = new QueryProcessor(ih);
+        vector<string>* parsedQuery = qP->parseQueryString("congestion");
+        set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 4);
+
+        parsedQuery = qP->parseQueryString("congestion AUTHOR samy");
+        searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 1);
+    }
+
+    SECTION("NONE AUTHOR NOT"){
+        IndexHandler *ih = new IndexHandler("../test_data");
+        ih->createIndex();
+
+        QueryProcessor *qP = new QueryProcessor(ih);
+        vector<string>* parsedQuery = qP->parseQueryString("cell");
+        set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 75);
+
+        parsedQuery = qP->parseQueryString("cell AUTHOR wang");
+        searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 12);
+
+        parsedQuery = qP->parseQueryString("cell AUTHOR wang NOT vaccine");
+        searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 11);
+    }
+
+    SECTION("AND AUTHOR NOT"){
+        IndexHandler *ih = new IndexHandler("../test_data");
+        ih->createIndex();
+
+        QueryProcessor *qP = new QueryProcessor(ih);
+        vector<string>* parsedQuery = qP->parseQueryString("AND cell virus");
+        set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 66);
+
+        parsedQuery = qP->parseQueryString("AND cell virus AUTHOR wang");
+        searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 11);
+
+        parsedQuery = qP->parseQueryString("AND cell virus AUTHOR wang NOT vaccine");
+        searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 10);
+    }
+
+    SECTION("OR AUTHOR NOT"){
+        IndexHandler *ih = new IndexHandler("../test_data");
+        ih->createIndex();
+
+        QueryProcessor *qP = new QueryProcessor(ih);
+        vector<string>* parsedQuery = qP->parseQueryString("OR cell virus");
+        set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 90);
+
+        parsedQuery = qP->parseQueryString("OR cell virus AUTHOR wang");
+        searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 13);
+
+        parsedQuery = qP->parseQueryString("OR cell virus AUTHOR wang NOT vaccine");
+        searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 12);
+    }
+
+    /*SECTION("AUTHOR NOT"){
+        IndexHandler *ih = new IndexHandler("../test_data");
+        ih->createIndex();
+
+        QueryProcessor *qP = new QueryProcessor(ih);
+        vector<string>* parsedQuery = qP->parseQueryString("AUTHOR wang");
+        set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 50);
+
+        parsedQuery = qP->parseQueryString("AUTHOR wang NOT vaccine");
+        searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 12);
+    }*/
 }

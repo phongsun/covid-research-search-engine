@@ -36,10 +36,24 @@ inline void QueryProcessor::searchKeywordIndex(const vector<string> &searchWords
     }
 }
 
+inline void QueryProcessor::searchAuthorIndex(const vector<string> &authors,
+                                               set<string> &documentIDSet) {
+
+    for(int i = 0; i < authors.size(); i++){ // go to the index to search every search word
+        unordered_set<string> searchResult;
+        string searchPhrase = authors[i];
+        preprocess(searchPhrase, false);
+        searchResult = this->indexHandler->searchByAuthor(searchPhrase);
+        for(auto documentID: searchResult){
+            documentIDSet.insert(documentID);
+        }
+    }
+}
+
 inline void QueryProcessor::buildQueryResult(const vector<IndexNodeData*> &searchResults,
                              const set<string> &intersectionList,
                              const set<string> &unionList,
-                             const set<string> &authors,
+                             const set<string> &authorDocumentIDList,
                              const set<string> &excludedWords,
                              set<QueryResultData> &queryResultSet){
 
@@ -48,39 +62,44 @@ inline void QueryProcessor::buildQueryResult(const vector<IndexNodeData*> &searc
         // loop through each search result
         for (auto docIdAndTf: searchResult->invertedTermFreq) {
             // determine if the current document ID is in the intersection
-            if ((intersectionList.size() > 0 && (intersectionList.find(docIdAndTf.first) != intersectionList.end()))
+            if ((intersectionList.size() > 0 && (intersectionList.find(docIdAndTf.first) != intersectionList.end())) // AND
                 ||
-                (unionList.size() > 0 && (unionList.find(docIdAndTf.first) != unionList.end()))
+                (unionList.size() > 0 && (unionList.find(docIdAndTf.first) != unionList.end())) // OR
                 ||
-                (intersectionList.size() == 0 && unionList.size() == 0) // single keyword search
-                ) { // only add the search result to the query result data if the documentID is in the documentIDSets
-                if (excludedWords.size() == 0 || (excludedWords.find(docIdAndTf.first) == excludedWords.end())) {
-                    QueryResultData queryResultData;
-                    queryResultData.documentId = docIdAndTf.first;
-                    queryResultData.tf = docIdAndTf.second;
-                    queryResultData.idf = searchResult->idf;
-                    queryResultData.weight = queryResultData.tf * queryResultData.idf;
-                    queryResultData.publicationDate = this->indexHandler->metaDataMap[docIdAndTf.first].publicationDate;
-                    queryResultData.title = this->indexHandler->metaDataMap[docIdAndTf.first].title;
-                    // abstract and authors
-                    queryResultData.authorString = this->indexHandler->metaDataMap[docIdAndTf.first].author;
-                    queryResultData.abstract = this->indexHandler->metaDataMap[docIdAndTf.first].abstract;
-                    bool isInsert = true;
-                    // go through existing result set
-                    for (auto d : queryResultSet) {
-                        // if the document id already exist in the result set
-                        if (d == queryResultData.documentId) {
-                            // check if the weight of existing element is < than the new weight
-                            if (d.weight < queryResultData.weight) {
-                                // assign th bigger weight to exiting element.
-                                d.weight = queryResultData.weight;
+                (intersectionList.size() == 0 && unionList.size() == 0) // NONE
+                ) {
+                // only add the search result to the query result data if the documentID is in the documentIDSets
+                // if the document ID is in the author list, then it can be part of the results
+                if (authorDocumentIDList.size() == 0 || (authorDocumentIDList.find(docIdAndTf.first) != authorDocumentIDList.end())) {
+                    // if the document ID is not in the exclusion list, then it can be part of the results
+                    if (excludedWords.size() == 0 || (excludedWords.find(docIdAndTf.first) == excludedWords.end())) {
+                        QueryResultData queryResultData;
+                        queryResultData.documentId = docIdAndTf.first;
+                        queryResultData.tf = docIdAndTf.second;
+                        queryResultData.idf = searchResult->idf;
+                        queryResultData.weight = queryResultData.tf * queryResultData.idf;
+                        queryResultData.publicationDate = this->indexHandler->metaDataMap[docIdAndTf.first].publicationDate;
+                        queryResultData.title = this->indexHandler->metaDataMap[docIdAndTf.first].title;
+                        // abstract and authorDocumentIDList
+                        queryResultData.authorString = this->indexHandler->metaDataMap[docIdAndTf.first].author;
+                        queryResultData.abstract = this->indexHandler->metaDataMap[docIdAndTf.first].abstract;
+                        bool isInsert = true;
+                        // go through existing result set
+                        for (auto d : queryResultSet) {
+                            // if the document id already exist in the result set
+                            if (d == queryResultData.documentId) {
+                                // check if the weight of existing element is < than the new weight
+                                if (d.weight < queryResultData.weight) {
+                                    // assign th bigger weight to exiting element.
+                                    d.weight = queryResultData.weight;
+                                }
+                                isInsert = false;
+                                break;
                             }
-                            isInsert = false;
-                            break;
                         }
+                        if (isInsert)
+                            queryResultSet.insert(queryResultData);
                     }
-                    if (isInsert)
-                        queryResultSet.insert(queryResultData);
                 }
             }
         }
@@ -89,9 +108,9 @@ inline void QueryProcessor::buildQueryResult(const vector<IndexNodeData*> &searc
 
 set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searchWords, vector<string> excludedWords, vector<string> authors){
     set<QueryResultData> queryResultSet;
-    bool shouldExclude;
-    if(searchWords.size() == 0 && authors.size() == 0){
-        shouldExclude = false;
+    // trailing NOT operator cannot stand alone without keywords or authors
+    if(searchWords.size() == 0 && authors.size() == 0 && excludedWords.size() > 0){
+        return queryResultSet;
     }
 
     // declare an array of search results corresponding to the keywords
@@ -111,6 +130,11 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
         if (searchResults.size() == 0) {
             return queryResultSet;
         }
+        // create document ID set for authors
+        if(authors.size() > 0){
+            this->searchAuthorIndex(authors, authorResult);
+        }
+
     }
 
     // dealing with excluded words
@@ -218,6 +242,12 @@ vector<string>* QueryProcessor::parseQueryString(const string &queryString){
         //cout<< "+==+++==" << authorString<<endl;
     }
     if (op.compare("NONE") != 0 || (notPos == authorsPos )) {
+        keywordString = queryString.substr(keywordsPos, authorsPos - keywordsPos);
+        //cout<<"keywords="<<authorsPos<<"-"<<keywordsPos << endl;
+        //cout<<keywordString<<endl;
+    }
+
+    if (op.compare("NONE") == 0 || (notPos != authorsPos )) {
         keywordString = queryString.substr(keywordsPos, authorsPos - keywordsPos);
         //cout<<"keywords="<<authorsPos<<"-"<<keywordsPos << endl;
         //cout<<keywordString<<endl;
