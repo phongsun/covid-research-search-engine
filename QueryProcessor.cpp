@@ -140,12 +140,7 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
             intersectionResult = documentIDSets[0];
         }
 
-        buildQueryResult(searchResults,
-                         intersectionResult,
-                         unionResult,
-                         authorResult,
-                         exclusionResult,
-                         queryResultSet);
+
     }
 
     else if(logicOp.compare("OR") == 0){
@@ -165,8 +160,6 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
         /*for(int i = 2; i < documentIDSets.size(); i++){
             set_intersection(documentIDSets[i].begin(), documentIDSets[i].end(), documentIDSets.begin(), documentIDSets.end(), inserter(intersectionResult, intersectionResult.begin()));
         }*/
-
-        buildQueryResult(searchResults, intersectionResult, unionResult, authorResult, exclusionResult, queryResultSet);
     }
 
     else if(logicOp.compare("NONE") == 0 && excludedWords.size() == 0 && authors.size() == 0){ // single keyword scenario
@@ -181,16 +174,16 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
             return queryResultSet; // return empty result set
         }
 
-        buildQueryResult(searchResults,
-                         intersectionResult,
-                         unionResult,
-                         authorResult,
-                         exclusionResult,
-                         queryResultSet);
+
     }
 
 
-
+    buildQueryResult(searchResults,
+                     intersectionResult,
+                     unionResult,
+                     authorResult,
+                     exclusionResult,
+                     queryResultSet);
     return queryResultSet;
 }
 
