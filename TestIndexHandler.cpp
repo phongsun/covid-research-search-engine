@@ -88,7 +88,7 @@ TEST_CASE("IndexHandler", "IndexHandler") {
             REQUIRE(ih->totalUniqueAuthors == 0);
             REQUIRE(ih->top50OriginalWordsData.size() == 0);
             REQUIRE(ih->topStemmed50WordsData.size() == 0);
-
+            delete ih;
             /*double vm2, rss2;
             mem_usage(vm2, rss2);
             cout << "After Delete Index - Virtual Memory: " << vm2 << "\nResident set size: " << rss2 << endl;
@@ -103,6 +103,7 @@ TEST_CASE("IndexHandler", "IndexHandler") {
 
             unordered_set<string> documentIds = ih->searchByAuthor("wang");
             REQUIRE(documentIds.size() == 14);
+            delete ih;
         }
     }
 }

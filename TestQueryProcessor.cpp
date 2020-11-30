@@ -137,6 +137,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         vector<string>* parsedQuery = qP->parseQueryString(queryString);
         set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
         REQUIRE(searchResults.size() == 1);
+        delete qP;
     }
 
     SECTION("Search with OR only"){
@@ -149,6 +150,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         vector<string>* parsedQuery = qP->parseQueryString(queryString);
         set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
         REQUIRE(searchResults.size() == 14);
+        delete qP;
     }
 
     SECTION("Search single NOT"){
@@ -167,6 +169,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         /*for (auto r: searchResults) {
             cout << r.weight << " |" << r.publicationDate << endl;
         }*/
+        delete qP;
     }
 
     SECTION("OR NOT"){
@@ -183,6 +186,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         parsedQuery = qP->parseQueryString("OR cell congestion NOT covid");
         searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
         REQUIRE(searchResults.size() == 72);
+        delete qP;
     }
 
     SECTION("AND NOT"){
@@ -199,6 +203,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         parsedQuery = qP->parseQueryString("AND covid vaccine NOT cell");
         searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
         REQUIRE(searchResults.size() == 11);
+        delete qP;
     }
 
     SECTION("AND AUTHOR"){
@@ -215,6 +220,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         parsedQuery = qP->parseQueryString("AND covid vaccine AUTHOR wang");
         searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
         REQUIRE(searchResults.size() == 4);
+        delete qP;
     }
 
     SECTION("OR AUTHOR"){
@@ -231,6 +237,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         parsedQuery = qP->parseQueryString("OR cell congestion AUTHOR wang");
         searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
         REQUIRE(searchResults.size() == 12);
+        delete qP;
     }
 
     SECTION("NONE AUTHOR"){
@@ -245,6 +252,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         parsedQuery = qP->parseQueryString("congestion AUTHOR samy");
         searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
         REQUIRE(searchResults.size() == 1);
+        delete qP;
     }
 
     SECTION("NONE AUTHOR NOT"){
@@ -263,6 +271,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         parsedQuery = qP->parseQueryString("cell AUTHOR wang NOT vaccine");
         searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
         REQUIRE(searchResults.size() == 11);
+        delete qP;
     }
 
     SECTION("AND AUTHOR NOT"){
@@ -281,6 +290,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         parsedQuery = qP->parseQueryString("AND cell virus AUTHOR wang NOT vaccine");
         searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
         REQUIRE(searchResults.size() == 10);
+        delete qP;
     }
 
     SECTION("OR AUTHOR NOT"){
@@ -299,6 +309,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         parsedQuery = qP->parseQueryString("OR cell virus AUTHOR wang NOT vaccine");
         searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
         REQUIRE(searchResults.size() == 12);
+        delete qP;
     }
 
     /*SECTION("AUTHOR NOT"){

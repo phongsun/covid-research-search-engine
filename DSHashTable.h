@@ -133,6 +133,7 @@ private:
     // resize the table with the same values but a
     void resize_table(uint32_t newSize) {
         this->table.resize(newSize);
+        this->tableSize = newSize;
     }
     inline unsigned int hash(const K &s)
     {
@@ -149,7 +150,7 @@ public:
 
     DSHashTable<K, V>(const DSHashTable<K, V> &old) : table(old.table), tableSize(old.tableSize) {}
 
-    ~DSHashTable<K, V>() {}
+    ~DSHashTable<K, V>() { table.clear(); }
 
     DSHashTable<K, V> &operator=(const DSHashTable<K, V> &old) {
         if (&old != this)
@@ -263,6 +264,21 @@ public:
                 ostr << ' ' << *p;
             ostr << std::endl;
         }
+    }
+
+    // A public print utility.
+    int count() {
+        int cnt = 0;
+        for (unsigned int i = 0; i < table.size(); ++i) {
+            for (BucketListIterator p = table[i].begin(); p != table[i].end(); ++p)
+                cnt++;
+        }
+
+        return cnt;
+    }
+
+    void erase() {
+        table.clear();
     }
 };
 
