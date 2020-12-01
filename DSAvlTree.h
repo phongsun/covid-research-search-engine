@@ -10,6 +10,44 @@
 template<typename T>
 class DSAvlTree{
 public:
+    class Iterator {
+    public:
+        friend class DSAvlTree<T>; // allows access to private variables
+
+        bool hasNext() {
+            if(stack.empty()) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        DSAvlNode<T>* next() {
+            // pre order traversal
+            if(!hasNext()){
+                return nullptr;
+            }
+            DSAvlNode<T> *n = stack.top();
+            stack.pop();
+            if(n->left != nullptr) stack.push(n->left);
+            if(n->right != nullptr) stack.push(n->right);
+
+            return  n;
+        }
+
+    private:
+        // private constructors for use by the DSAvlTree only
+        Iterator(DSAvlTree<T> *t) {
+            this->tree = t;
+            stack.push(tree->root);
+        }
+        DSAvlTree<T> *tree;
+        stack<DSAvlNode<T>*> stack;
+
+    };
+
+
+public:
     DSAvlTree() {
         this->root = nullptr;
     }
@@ -43,8 +81,17 @@ public:
         return count(this->root);
     }
 
+    Iterator iterator() {
+        Iterator p(this);
+        return p;
+    }
+
     void serialize(ostream &os) {
         this->serialize(this->root, os);
+    }
+
+    void deserialize(istream &is) {
+        this->root = deserializeNode(is);
     }
 
     // null representation in json for IndexNodeData

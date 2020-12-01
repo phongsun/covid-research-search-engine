@@ -18,7 +18,7 @@ public:
     bool operator== (const IndexNodeData& rhs) const;
     bool operator< (const IndexNodeData& rhs) const;
     bool operator> (const IndexNodeData& rhs) const;
-
+    bool equal ( IndexNodeData& rhs);
     string toJsonString() const; // convert the object to a json string to serialize
 
     // IDF(t) = log_e(Total number of documents / Number of documents with term t in it).

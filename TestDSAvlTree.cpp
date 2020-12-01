@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 TEST_CASE("DSAvlTree", "[DSAvlTree]"){
+
     SECTION("Validate Cases 1-4"){
         int dataList[11] = {10, 20, 30, 25, 22, 4, 6, 35, 21, 23, 24};
         DSAvlTree<int> testTree;
@@ -68,7 +69,7 @@ TEST_CASE("DSAvlTree", "[DSAvlTree]"){
         REQUIRE(testTree.search(35)->height == 0);
     }
 
-    SECTION("Delete tree") {
+    SECTION("Tree Deletion") {
         int dataList[11] = {10, 20, 30, 25, 22, 4, 6, 35, 21, 23, 24};
         DSAvlTree<int> *testTree = new DSAvlTree<int>();
 
@@ -79,16 +80,43 @@ TEST_CASE("DSAvlTree", "[DSAvlTree]"){
         delete testTree;
     }
 
+    SECTION("Tree Iterator") {
+        vector<int> d1 = {10, 20, 30, 25, 22, 4, 6, 35, 21, 23, 24};
+        DSAvlTree<int> *testTree = new DSAvlTree<int>();
+
+        // insert everything from dataList to the AVL tree called testTree
+        for (int i = 0; i < 11; i++) {
+            testTree->insert(d1[i]);
+        }
+
+        DSAvlTree<int>::Iterator iter = testTree->iterator();
+        vector<int> d2;
+        while (iter.hasNext()) {
+            d2.push_back(iter.next()->element);
+        }
+
+        sort(d1.begin(), d1.end());
+        sort(d2.begin(), d2.end());
+        for (int i = 0; i < 11; i++) {
+            REQUIRE(d1[i] == d2[i]);
+        }
+
+        delete testTree;
+    }
+
     SECTION( "Serialization" ) {
         IndexHandler *ih = new IndexHandler("../test_data");
         // load files into the index
         ih->createIndex();
+        // save the tree to a file
         ih->persistIndex();
 
+        // read line from the tree file
         string line;
         ifstream myfile;
         myfile.open(ih->getKeyWordIndexFilePath());
 
+        // count lines that are not "NULL"
         REQUIRE(myfile.is_open() == true);
         int cnt = 0;
         while(getline(myfile, line)) {
@@ -97,8 +125,34 @@ TEST_CASE("DSAvlTree", "[DSAvlTree]"){
             }
         }
         myfile.close();
+
+        // count of NONE NULL lines needs to equal to the number of nodes in the tree
         REQUIRE(ih->totalWordsIndexed == cnt);
         remove(ih->getKeyWordIndexFilePath().c_str());
+
+        delete ih;
     }
 
+    SECTION( "Deserialization" ) {
+        IndexHandler *ih_serialize = new IndexHandler("../test_data");
+        // load files into the index
+        ih_serialize->createIndex();
+        // save serialized tree to the file
+        ih_serialize->persistIndex();
+
+        // restore tree from the file
+        IndexHandler *ih_deserialize = new IndexHandler("../test_data");
+        REQUIRE(ih_deserialize->isIndexEmpty() == true);
+        ih_deserialize->restoreIndex();
+
+        // retrieved tree should be the same as the saved tree*/
+        DSAvlTree<IndexNodeData>::Iterator itS = ih_serialize->getTreeIterator();
+        DSAvlTree<IndexNodeData>::Iterator itD = ih_deserialize->getTreeIterator();
+        for(int i = 0; i < ih_serialize->totalWordsIndexed; i++){
+            REQUIRE(itS.next()->element.equal(itD.next()->element) == true);
+        }
+
+        delete ih_deserialize;
+        delete ih_serialize;
+    }
 }

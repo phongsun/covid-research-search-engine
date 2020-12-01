@@ -71,6 +71,20 @@ bool IndexHandler::persistIndex(){
     }
 }
 
+bool IndexHandler::restoreIndex(){
+    this->clearIndex();
+
+    ifstream fileToRead (this->getKeyWordIndexFilePath());
+    if (fileToRead.is_open())
+    {
+        this->keyWordIndex = new DSAvlTree<IndexNodeData>();
+        this->keyWordIndex->deserialize(fileToRead);
+        fileToRead.close();
+        return true;
+    }
+    return false;
+}
+
 IndexNodeData* IndexHandler::searchByKeyword(const string &keyWord){
     if (this->keyWordIndex == nullptr) {
         cout << "The Keyword Index is empty. ";

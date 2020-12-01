@@ -18,6 +18,8 @@ public:
     IndexHandler(const string &corpusPath);
     int createIndex();
     bool persistIndex();
+    bool restoreIndex();
+
     IndexNodeData* searchByKeyword(const string &keyWord);
     unordered_set<string> searchByAuthor(const string &author);
 
@@ -35,6 +37,7 @@ public:
     std::vector<std::pair<int,string>> top50OriginalWordsData;
     unordered_map<string, ArticleMetaData> loadMetaData(const string &corpusPath);
 
+    DSAvlTree<IndexNodeData>::Iterator getTreeIterator() { return this->keyWordIndex->iterator(); }
     void setPersistentDir(const string &input) { this->persistentDir = input; }
     string getPersistentDir() { return this->persistentDir; }
     string getKeyWordIndexFilePath() { return this->persistentDir + "/" + this->keyWordIndexFile; }

@@ -32,6 +32,22 @@ bool IndexNodeData::operator> (const IndexNodeData& rhs) const{
     }
 }
 
+bool IndexNodeData::equal (IndexNodeData& rhs){
+    if(this->keyWord.compare(rhs.keyWord) == 0 && this->invertedWordFreq.size() ==  rhs.invertedWordFreq.size()) {
+        for (auto k : this->invertedWordFreq) {
+            unsigned int rhs_v = rhs.invertedWordFreq[k.first];
+            if (k.second != rhs_v) {
+                return false;
+            }
+        }
+        return true;
+
+    } else {
+        return false;
+    }
+
+}
+
 void IndexNodeData::calculateIdf(unsigned int totalArticlesIndexed) {
     //IDF(t) = log_e(Total number of documents / Number of documents with term t in it).
     int numberOfDocumentsForKeyWord = this->invertedWordFreq.size();
