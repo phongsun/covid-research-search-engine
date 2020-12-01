@@ -5,32 +5,8 @@
 #include "catch.hpp"
 #include "IndexHandler.h"
 #include <unistd.h>
-#include <ios>
-#include <iostream>
-#include <fstream>
 #include <string>
 using namespace std;
-
-void mem_usage(double& vm_usage, double& resident_set) {
-    vm_usage = 0.0;
-    resident_set = 0.0;
-    ifstream stat_stream("/proc/self/stat",ios_base::in); //get info from proc directory
-    //create some variables to get info
-    string pid, comm, state, ppid, pgrp, session, tty_nr;
-    string tpgid, flags, minflt, cminflt, majflt, cmajflt;
-    string utime, stime, cutime, cstime, priority, nice;
-    string O, itrealvalue, starttime;
-    unsigned long vsize;
-    long rss;
-    stat_stream >> pid >> comm >> state >> ppid >> pgrp >> session >> tty_nr
-                >> tpgid >> flags >> minflt >> cminflt >> majflt >> cmajflt
-                >> utime >> stime >> cutime >> cstime >> priority >> nice
-                >> O >> itrealvalue >> starttime >> vsize >> rss; // don't care about the rest
-    stat_stream.close();
-    long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024; // for x86-64 is configured to use 2MB pages
-            vm_usage = vsize / 1024.0;
-    resident_set = rss * page_size_kb;
-}
 
 TEST_CASE("IndexHandler", "IndexHandler") {
     SECTION("Create Keyword Index") {
@@ -104,6 +80,46 @@ TEST_CASE("IndexHandler", "IndexHandler") {
             unordered_set<string> documentIds = ih->searchByAuthor("wang");
             REQUIRE(documentIds.size() == 14);
             delete ih;
+        }
+    }
+
+    SECTION("Serialize and Deserailize Author Index") {
+        SECTION("Clear Index"){
+            IndexHandler *ih1 = new IndexHandler("../test_data");
+            ih1->createIndex();
+            REQUIRE(ih1->persistAuthorIndex() == true);
+            DSHashTable<string, unordered_set<string>>* author1 = ih1->authorX();
+            DSHashTable<string, unordered_set<string>>::Iterator iter1 = author1->begin();
+
+            IndexHandler *ihX = new IndexHandler("../test_data");
+            ihX->clearIndex();
+            REQUIRE(ihX->restoreAuthorIndex() == true);
+            DSHashTable<string, unordered_set<string>>* authorX = ihX->authorX();
+
+            while (iter1 != author1->end()) {
+                pair<string, unordered_set<string>> el_1 = *iter1;
+                DSHashTable<string, unordered_set<string>>::Iterator tmpX = authorX->find(el_1.first);
+                // the same author name should match in both index
+                REQUIRE(tmpX != authorX->end());
+                // for the same author, all documents in the list should match
+                unordered_set<string>::iterator docIter1 = el_1.second.begin(); // document id iterator
+                unordered_set<string> docListX= (*tmpX).second; // document id list in restored index
+                unordered_set<string>::iterator docIterXEnd = (*tmpX).second.end();
+                while (docIter1 != el_1.second.end()) {
+                    string docId1 = *docIter1; // doc ID in from original index
+                    REQUIRE(docListX.find(docId1) != docIterXEnd); // should find it in restored index
+                    docIter1++;
+                }
+                iter1++;
+            }
+
+            unordered_set<string> documentIds_1 = ih1->searchByAuthor("wang");
+            REQUIRE(documentIds_1.size() == 14);
+
+            unordered_set<string> documentIds_x = ihX->searchByAuthor("wang");
+            REQUIRE(documentIds_x.size() == 14);
+            delete ih1;
+            delete ihX;
         }
     }
 }

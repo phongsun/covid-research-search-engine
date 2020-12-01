@@ -74,13 +74,22 @@ public:
             return temp;
         }
 
-    private:
+
         DSHashTable<K, V> *hashTable;
+    private:
         int currentIndex; // current bucket/index in the hash table
         BucketListIterator currentBucketIter; // current bucket iterator at the current bucket/index
 
         // private constructors for use by the DSHashtable only
         Iterator(DSHashTable<K, V> *ht) : hashTable(ht), currentIndex(-1) {}
+        Iterator(DSHashTable<K, V> *ht, int index) : hashTable(ht) {
+            this->currentIndex = 0;
+            this->currentBucketIter = this->hashTable->table[0].begin();
+            if (this->currentBucketIter == this->hashTable->table[0].begin()) {
+                this->next();
+            }
+
+        }
 
         Iterator(DSHashTable<K, V> *ht, int index, BucketListIterator loc)
                 : hashTable(ht), currentIndex(index), currentBucketIter(loc) {}
@@ -243,8 +252,8 @@ public:
 
     // Find the first entry in the table and create an associated iterator
     Iterator begin() {
-        Iterator p(this);
-        p.currentIndex = 0;
+        Iterator p(this, 0);
+
         return p;
     }
 

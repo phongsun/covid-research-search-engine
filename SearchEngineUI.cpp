@@ -61,8 +61,8 @@ void SearchEngineUI::clearScreen(){
 void SearchEngineUI::clearIndex() {
     // if the index is already empty notify the user
     if(this->queryProcessor->isIndexEmpty()){
-        cout << "Index is already clear. Press any key to go back to the main menu." << endl;
-        int tmp;
+        cout << "Index is already clear. Press any key then enter to go back to the main menu." << endl;
+        string tmp;
         cin >> tmp;
     }else{ // otherwise confirm with the user
         bool choiceChosen = false;
@@ -96,6 +96,7 @@ void SearchEngineUI::parseCorpus(){
             char choice;
             cout << "The index is not empty. If you continue, the current index will be overwritten. Are you sure? (y/n)"
                  << endl;
+            cin >> choice;
             if(choice == 'y'){
                 // clear index and give the program the 'thumbs up' to create the index
                 this->queryProcessor->clearIndex();
@@ -152,6 +153,7 @@ void SearchEngineUI::search(){
             cout << "Which search result would you like to see the abstract for? (1-15)" << endl;
             cout << "Or do you want to exit to the main menu? (0)" << endl;
             int abstractOrQuit;
+            cout << "Enter your choice here: ";
             cin >> abstractOrQuit;
             if (abstractOrQuit >= 1 && abstractOrQuit <= 15) {
                 abstractOrQuit--;

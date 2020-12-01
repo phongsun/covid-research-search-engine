@@ -10,6 +10,7 @@
 #include "DSAvlTree.h"
 #include "IndexNodeData.h"
 #include "ArticleMetaData.h"
+#include "simdjson.h"
 
 using namespace std;
 
@@ -17,7 +18,10 @@ class IndexHandler {
 public:
     IndexHandler(const string &corpusPath);
     int createIndex();
-    bool persistIndex();
+    bool persistKeywordIndex();
+    bool restoreKeywordIndex();
+    bool persistAuthorIndex();
+    bool restoreAuthorIndex();
     bool restoreIndex();
 
     IndexNodeData* searchByKeyword(const string &keyWord);
@@ -35,9 +39,11 @@ public:
     int totalUniqueAuthors = 0;
     std::vector<std::pair<int,string>> topStemmed50WordsData;
     std::vector<std::pair<int,string>> top50OriginalWordsData;
+
     unordered_map<string, ArticleMetaData> loadMetaData(const string &corpusPath);
 
-    DSAvlTree<IndexNodeData>::Iterator getTreeIterator() { return this->keyWordIndex->iterator(); }
+    DSAvlTree<IndexNodeData>::Iterator getAvlTreeIterator() { return this->keyWordIndex->iterator(); }
+    DSHashTable<string, unordered_set<string>>* authorX() { return this->authorIndex; }
     void setPersistentDir(const string &input) { this->persistentDir = input; }
     string getPersistentDir() { return this->persistentDir; }
     string getKeyWordIndexFilePath() { return this->persistentDir + "/" + this->keyWordIndexFile; }

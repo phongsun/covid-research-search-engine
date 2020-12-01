@@ -109,7 +109,7 @@ TEST_CASE("DSAvlTree", "[DSAvlTree]"){
         // load files into the index
         ih->createIndex();
         // save the tree to a file
-        ih->persistIndex();
+        ih->persistKeywordIndex();
 
         // read line from the tree file
         string line;
@@ -138,16 +138,16 @@ TEST_CASE("DSAvlTree", "[DSAvlTree]"){
         // load files into the index
         ih_serialize->createIndex();
         // save serialized tree to the file
-        ih_serialize->persistIndex();
+        ih_serialize->persistKeywordIndex();
 
         // restore tree from the file
         IndexHandler *ih_deserialize = new IndexHandler("../test_data");
         REQUIRE(ih_deserialize->isIndexEmpty() == true);
-        ih_deserialize->restoreIndex();
+        ih_deserialize->restoreKeywordIndex();
 
         // retrieved tree should be the same as the saved tree*/
-        DSAvlTree<IndexNodeData>::Iterator itS = ih_serialize->getTreeIterator();
-        DSAvlTree<IndexNodeData>::Iterator itD = ih_deserialize->getTreeIterator();
+        DSAvlTree<IndexNodeData>::Iterator itS = ih_serialize->getAvlTreeIterator();
+        DSAvlTree<IndexNodeData>::Iterator itD = ih_deserialize->getAvlTreeIterator();
         for(int i = 0; i < ih_serialize->totalWordsIndexed; i++){
             REQUIRE(itS.next()->element.equal(itD.next()->element) == true);
         }

@@ -55,7 +55,60 @@ int IndexHandler::createIndex(){
     return this->totalWordsIndexed;
 }
 
-bool IndexHandler::persistIndex(){
+bool IndexHandler::persistAuthorIndex() {
+    string json = "{\"ht\": [";
+    DSHashTable<string, unordered_set<string>>::Iterator iter = this->authorIndex->begin();
+    while (iter != this->authorIndex->end()) {
+        pair<string, unordered_set<string>> el = *iter;
+        string elJson = "{\"k\":\"" + el.first;
+        elJson += "\", \"v\":[";
+
+        for (auto d : el.second) {
+            elJson += "\"" + d + "\",";
+        }
+        elJson[elJson.length() - 1] = ']'; // replace the last comma
+        elJson += "},";
+
+        json += elJson; // add element to the bigger string
+        iter++;
+    }
+    json[json.length() - 1] = ']';
+    json += "}";
+
+
+    ofstream fileToWrite (this->getAuthorIndexFilePath());
+    if (fileToWrite.is_open()) {
+        fileToWrite<<json;
+        fileToWrite.close();
+        return true;
+    }
+
+    return false;
+}
+bool IndexHandler::restoreAuthorIndex() {
+    simdjson::dom::parser jsonParser;
+    // load json file
+    simdjson::dom::element doc = jsonParser.load(this->getAuthorIndexFilePath());
+    this->authorIndex = new DSHashTable<string, unordered_set<string>>();
+    for (auto kv: doc["ht"]) {
+        // parse key
+        string_view authorV = kv["k"].get_string();
+        string author = {authorV.begin(), authorV.end()};
+
+        // parse document list
+        unordered_set<string> docIdList;
+        for (auto d: kv["v"].get_array()) {
+            string_view docIdV = d.get_string();
+            string docId = {docIdV.begin(), docIdV.end()};
+            docIdList.insert(docId);
+        }
+        this->authorIndex->insert(pair<string, unordered_set<string>>(author, docIdList));
+    }
+
+    return this->authorIndex->count() > 0;
+}
+
+bool IndexHandler::persistKeywordIndex(){
     if (this->keyWordIndex == nullptr) {
         cout << "The Keyword Index is empty. ";
         return false;
@@ -73,7 +126,15 @@ bool IndexHandler::persistIndex(){
 
 bool IndexHandler::restoreIndex(){
     this->clearIndex();
+    if (this->restoreKeywordIndex() && this->restoreAuthorIndex()) {
+        return true;
+    } else {
+        this->clearIndex();
+        return false;
+    }
+}
 
+bool IndexHandler::restoreKeywordIndex(){
     ifstream fileToRead (this->getKeyWordIndexFilePath());
     if (fileToRead.is_open())
     {
