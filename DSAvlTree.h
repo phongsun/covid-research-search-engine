@@ -47,6 +47,9 @@ public:
         this->serialize(this->root, os);
     }
 
+    // null representation in json for IndexNodeData
+    const static string INDEX_NODE_DATA_MARKER;
+    const string MARKER = "-1";
 private:
     DSAvlNode<T> *root;
 
@@ -59,10 +62,8 @@ private:
     int count(DSAvlNode<T> * &t);
 
     void serialize(DSAvlNode<T> * &node, ostream &os);
+    DSAvlNode<T>* deserializeNode(istream &is);
 
-    // null representation in json for IndexNodeData
-    const string INDEX_NODE_DATA_MARKER = "{\"o\":{\"w\":\"NULL\"}}";
-    const string MARKER = "-1";
     string getMarker(const type_info &input){
         if (input == typeid(IndexNodeData)) {
             return INDEX_NODE_DATA_MARKER;
@@ -112,6 +113,9 @@ private:
     }
 };
 template<typename T>
+const string DSAvlTree<T>::INDEX_NODE_DATA_MARKER = "{\"o\":{\"w\":\"NULL\"}}";
+
+template<typename T>
 void DSAvlTree<T>::serialize(DSAvlNode<T> * &node, ostream &os){
     if (node == nullptr) {
         // if node is null, send the null reprsentation to the stream
@@ -119,11 +123,47 @@ void DSAvlTree<T>::serialize(DSAvlNode<T> * &node, ostream &os){
         return;
     }
     // preorder traversal
-    // IndexNodeData would call the overloaded <<
+    // IndexNodeData would call the overloaded << from IndexNodeData
     os << node->element << "\n";
     serialize(node->left, os);
     serialize(node->right, os);
 }
+
+template <typename T>
+DSAvlNode<T>* DSAvlTree<T>::deserializeNode(istream &is) {
+    if (is.eof()) { // reaching the end of the stream
+        return nullptr;
+    }
+    string val;
+    getline(is, val); // get the line from the stream
+
+    // if the line is the null representation of the T
+    if (val.compare(getMarker(typeid(T))) == 0) {
+        return nullptr;
+    }
+
+    // create IndexNodeData object from the line
+    T newElement;
+    istringstream lis(val); // create create a string stream for current line
+    // convert current line (string) into IndexNodeData
+    // >> is overloaded in IndexNodeData to translate json
+    lis >> newElement;
+
+    // preorder traversal
+    // create a node and store the new IndexNodeData object in the node
+    DSAvlNode<T> *pNode = new DSAvlNode<T>(newElement, nullptr, nullptr);
+    pNode->left = deserializeNode(is);
+    pNode->right = deserializeNode(is);
+    // calculate height for the new node
+    if (pNode->left == nullptr && pNode->right == nullptr) {
+        pNode->height = 0;
+    } else {
+        pNode->height = max(height(pNode->left), height(pNode->right)) + 1;
+    }
+
+    return pNode;
+}
+
 
 template<typename T>
 DSAvlNode<T>* DSAvlTree<T>::search(T data, DSAvlNode<T> * &c){

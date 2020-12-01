@@ -8,6 +8,7 @@
 #include <string>
 #include <unordered_map>
 #include <math.h>
+#include "simdjson.h"
 
 using namespace std;
 
@@ -24,10 +25,33 @@ public:
     void calculateIdf(unsigned int totalArticlesIndexed);
 
     // overloading << for ostream
-    // this is used by AvlTree.serialize() to save json representation to the output stream
+    // this is used by DSAvlTree.serialize() to save json representation to the output stream
     friend ostream& operator<<(ostream& os, const IndexNodeData& nodeData) {
         os << nodeData.toJsonString();
         return os;
+    }
+
+    // overloading >> for istream
+    // this is used by DSAvlTree.deserialize() to parse a json string
+    // the parsed json elements are used to populate the data parameter
+    friend istream& operator>> (istream& is, IndexNodeData& data) {
+        std::string s(std::istreambuf_iterator<char>(is), {});
+
+        // use json parser to get data points from the json string
+        // and populate data output parameter which is a type of IndexNodeData
+        simdjson::dom::parser jsonParser;
+        simdjson::dom::element doc = jsonParser.parse(s);
+        data.keyWord = doc["o"]["w"];
+        for(auto wordCount : doc["o"]["c"]){
+            string_view k_v = wordCount["k"].get_string();
+            string k = {k_v.begin(), k_v.end()};
+            string_view v_v = wordCount["v"].get_string();
+            string v = {v_v.begin(), v_v.end()};
+            int vI32 = stoi(v);
+            data.invertedWordFreq.insert({k, vI32});
+        }
+
+        return is;
     }
 
     string keyWord;

@@ -8,15 +8,15 @@
 #include "IndexHandler.h"
 #include "QueryProcessor.h"
 
-//#define TEST_ONLY true;
+#define TEST_ONLY true;
 
 using namespace std;
 
 int main(int argc, char** argv) {
-//#ifdef TEST_ONLY
-    //Catch::Session().run();
-    //return 0;
-//#endif
+#ifdef TEST_ONLY
+    Catch::Session().run();
+    return 0;
+#endif
 
     string searchPhrase = argv[1];
     Porter2Stemmer::stem(searchPhrase);

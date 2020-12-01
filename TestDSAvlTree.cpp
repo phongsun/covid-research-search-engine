@@ -4,6 +4,8 @@
 
 #include "catch.hpp"
 #include "DSAvlTree.h"
+#include "IndexHandler.h"
+#include <stdio.h>
 
 TEST_CASE("DSAvlTree", "[DSAvlTree]"){
     SECTION("Validate Cases 1-4"){
@@ -77,7 +79,26 @@ TEST_CASE("DSAvlTree", "[DSAvlTree]"){
         delete testTree;
     }
 
-    SECTION("Serialize tree") {
+    SECTION( "Serialization" ) {
+        IndexHandler *ih = new IndexHandler("../test_data");
+        // load files into the index
+        ih->createIndex();
+        ih->persistIndex();
 
+        string line;
+        ifstream myfile;
+        myfile.open(ih->getKeyWordIndexFilePath());
+
+        REQUIRE(myfile.is_open() == true);
+        int cnt = 0;
+        while(getline(myfile, line)) {
+            if (line.compare(DSAvlTree<IndexNodeData>::INDEX_NODE_DATA_MARKER) != 0) {
+                cnt++;
+            }
+        }
+        myfile.close();
+        REQUIRE(ih->totalWordsIndexed == cnt);
+        remove(ih->getKeyWordIndexFilePath().c_str());
     }
+
 }

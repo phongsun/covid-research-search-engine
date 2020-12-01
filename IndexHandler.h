@@ -17,11 +17,11 @@ class IndexHandler {
 public:
     IndexHandler(const string &corpusPath);
     int createIndex();
+    bool persistIndex();
     IndexNodeData* searchByKeyword(const string &keyWord);
     unordered_set<string> searchByAuthor(const string &author);
 
     void clearIndex();
-
     bool isIndexEmpty();
 
     unordered_map<string, ArticleMetaData> metaDataMap;
@@ -33,16 +33,22 @@ public:
     int totalUniqueAuthors = 0;
     std::vector<std::pair<int,string>> topStemmed50WordsData;
     std::vector<std::pair<int,string>> top50OriginalWordsData;
-//private:
+    unordered_map<string, ArticleMetaData> loadMetaData(const string &corpusPath);
+
+    void setPersistentDir(const string &input) { this->persistentDir = input; }
+    string getPersistentDir() { return this->persistentDir; }
+    string getKeyWordIndexFilePath() { return this->persistentDir + "/" + this->keyWordIndexFile; }
+    string getAuthorIndexFilePath() { return this->persistentDir + "/" + this->authorIndexFile; }
+
+private:
+    string persistentDir = "../persistence";
+    const string stopWordFile = "./stop_words.txt";
+    const string keyWordIndexFile = "keyword_index.json";
+    const string authorIndexFile = "author_index.json";
+
+    string corpusPath;
     DSAvlTree<IndexNodeData>* keyWordIndex;
     DSHashTable<string, unordered_set<string>> *authorIndex;
-
-    unordered_map<string, ArticleMetaData> loadMetaData(const string &corpusPath);
-    string corpusPath;
-    const string stopWordFile = "./stop_words.txt";
-    const string keyWordIndexFile = "./keyword_index.txt";
-    const string authorIndexFile = "./author_index.txt";
-
 };
 
 

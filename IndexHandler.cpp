@@ -28,8 +28,8 @@ void IndexHandler::clearIndex() {
 
     this->totalArticlesIndexed = 0;
     this->avgWordsIndexedPerArticle = 0;
-    //this->topStemmed50WordsData.erase(this->topStemmed50WordsData.begin(), this->topStemmed50WordsData.end());
-    //this->top50OriginalWordsData.erase(this->top50OriginalWordsData.begin(), this->top50OriginalWordsData.end());
+    this->topStemmed50WordsData.clear();
+    this->top50OriginalWordsData.clear();
     this->totalWordsIndexed =  0;
     this->totalUniqueAuthors = 0;
 }
@@ -53,6 +53,22 @@ int IndexHandler::createIndex(){
     this->totalWordsIndexed =  this->keyWordIndex->count();
 
     return this->totalWordsIndexed;
+}
+
+bool IndexHandler::persistIndex(){
+    if (this->keyWordIndex == nullptr) {
+        cout << "The Keyword Index is empty. ";
+        return false;
+    }
+    string keyWordIndexFilePath = this->getKeyWordIndexFilePath();
+    ofstream fileToWrite (keyWordIndexFilePath);
+    if (fileToWrite.is_open()) {
+        this->keyWordIndex->serialize(fileToWrite);
+        fileToWrite.close();
+        return true;
+    } else {
+        return false;
+    }
 }
 
 IndexNodeData* IndexHandler::searchByKeyword(const string &keyWord){
