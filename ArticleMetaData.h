@@ -14,7 +14,7 @@ public:
     string author;
     string abstract;
     string datePublished;
-    string publicationDOI; // Digital Object Identifier for the publication
+    string publication; // publication name
 };
 
 

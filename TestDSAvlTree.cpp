@@ -76,4 +76,8 @@ TEST_CASE("DSAvlTree", "[DSAvlTree]"){
         }
         delete testTree;
     }
+
+    SECTION("Serialize tree") {
+
+    }
 }

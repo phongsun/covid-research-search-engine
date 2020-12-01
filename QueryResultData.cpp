@@ -50,7 +50,7 @@ bool QueryResultData::operator< (const QueryResultData& rhs) const{
     if (this->weight > rhs.weight){
         return true;
     }else if (this->weight == rhs.weight){
-        // compare publicationDOI date
+        // compare publication date
         if (difftime(this->getPubDate(), rhs.getPubDate()) > 0) {
             return true;
         } else if (difftime(this->getPubDate(), rhs.getPubDate()) == 0) { // date same, compare title
@@ -71,7 +71,7 @@ bool QueryResultData::operator> (const QueryResultData& rhs) const{
     if (this->weight < rhs.weight){ // inverse the > to < so that set puts highest weight on top
         return true;
     }else if (this->weight == rhs.weight){
-    // compare publicationDOI date
+    // compare publication date
         if (difftime(this->getPubDate(), rhs.getPubDate()) < 0) {
             return true;
         } else if (difftime(this->getPubDate(), rhs.getPubDate()) == 0) { // date same, compare title

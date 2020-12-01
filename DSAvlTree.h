@@ -43,6 +43,10 @@ public:
         return count(this->root);
     }
 
+    void serialize(ostream &os) {
+        this->serialize(this->root, os);
+    }
+
 private:
     DSAvlNode<T> *root;
 
@@ -53,6 +57,19 @@ private:
     void doubleWithLeftChild(DSAvlNode<T>* &k3);
     DSAvlNode<T> *search(T data, DSAvlNode<T> * &c);
     int count(DSAvlNode<T> * &t);
+
+    void serialize(DSAvlNode<T> * &node, ostream &os);
+
+    // null representation in json for IndexNodeData
+    const string INDEX_NODE_DATA_MARKER = "{\"o\":{\"w\":\"NULL\"}}";
+    const string MARKER = "-1";
+    string getMarker(const type_info &input){
+        if (input == typeid(IndexNodeData)) {
+            return INDEX_NODE_DATA_MARKER;
+        } else {
+            return MARKER;
+        }
+    }
 
     void deleteNode(DSAvlNode<T> *c) {
         if (c!= nullptr) {
@@ -94,6 +111,19 @@ private:
         return lhs > rhs ? lhs : rhs;
     }
 };
+template<typename T>
+void DSAvlTree<T>::serialize(DSAvlNode<T> * &node, ostream &os){
+    if (node == nullptr) {
+        // if node is null, send the null reprsentation to the stream
+        os<< getMarker(typeid(T)) << "\n";
+        return;
+    }
+    // preorder traversal
+    // IndexNodeData would call the overloaded <<
+    os << node->element << "\n";
+    serialize(node->left, os);
+    serialize(node->right, os);
+}
 
 template<typename T>
 DSAvlNode<T>* DSAvlTree<T>::search(T data, DSAvlNode<T> * &c){

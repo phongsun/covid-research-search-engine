@@ -6,6 +6,8 @@
 #define SEARCHENGINE_DSAVLNODE_H
 
 #include <iostream>
+#include <fstream>
+#include "IndexNodeData.h"
 using namespace std;
 
 template<typename T>

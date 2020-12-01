@@ -18,6 +18,7 @@ using namespace std;
 class QueryProcessor {
 public:
     QueryProcessor(IndexHandler *indexHandler);
+    void clearIndex();
     unsigned int createIndex();
     set<QueryResultData> search(string logicOp, vector<string> searchWords, vector<string> excludedWords, vector<string> authors);
     vector<string>* parseQueryString(const string &queryString);
@@ -37,6 +38,15 @@ public:
                                  set<QueryResultData> &queryResultSet);
 
     void preprocess(string &input, bool shouldStem = true);
+
+    bool isIndexEmpty();
+
+    vector<pair<int, string>> getTop50OriginalWords();
+    int getTotalUniqueAuthors();
+    unsigned int getTotalWordsIndexed();
+    unsigned int getAvgWordsIndexedPerArticle();
+    unsigned int getTotalArticlesIndexed();
+
 
     const int OP = 3;
     const int KEYWORD = 0;

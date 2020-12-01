@@ -166,9 +166,9 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
         REQUIRE(searchResults.size() == 71);
 
-        /*for (auto r: searchResults) {
-            cout << r.weight << " |" << r.datePublished << " |" << r.publicationDOI <<endl;
-        }*/
+        for (auto r: searchResults) {
+            cout << r.weight << " |" << r.datePublished << " |" << r.publication << endl;
+        }
         delete qP;
     }
 

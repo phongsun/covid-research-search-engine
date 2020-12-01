@@ -26,7 +26,7 @@ public:
     double idf = 0;
     double weight = 0;
     string datePublished;
-    string publicationDOI; // Digital Object ID for the publication
+    string publication; // publication name
     string title;
     string authorString;
     string abstract;

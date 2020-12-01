@@ -8,6 +8,10 @@ QueryProcessor::QueryProcessor(IndexHandler *indexHandler){
     this->indexHandler = indexHandler;
 }
 
+void QueryProcessor::clearIndex(){
+    this->indexHandler->clearIndex();
+}
+
 unsigned int QueryProcessor::createIndex(){
     return this->indexHandler->createIndex();
 }
@@ -82,7 +86,7 @@ inline void QueryProcessor::buildQueryResult(const vector<IndexNodeData*> &searc
                         queryResultData.weight =  tf * queryResultData.idf;
                         queryResultData.datePublished = this->indexHandler->metaDataMap[docIdAndTf.first].datePublished;
                         queryResultData.title = this->indexHandler->metaDataMap[docIdAndTf.first].title;
-                        queryResultData.publicationDOI = this->indexHandler->metaDataMap[docIdAndTf.first].publicationDOI;
+                        queryResultData.publication = this->indexHandler->metaDataMap[docIdAndTf.first].publication;
                         // abstract and authorDocumentIDList
                         queryResultData.authorString = this->indexHandler->metaDataMap[docIdAndTf.first].author;
                         queryResultData.abstract = this->indexHandler->metaDataMap[docIdAndTf.first].abstract;
@@ -289,4 +293,24 @@ void QueryProcessor::preprocess(string &input, bool shouldStem) {
     if(shouldStem == true){
         Porter2Stemmer::stem(input);
     }
+}
+
+bool QueryProcessor::isIndexEmpty(){
+    return this->indexHandler->isIndexEmpty();
+}
+
+vector<pair<int, string>> QueryProcessor::getTop50OriginalWords(){
+    return this->indexHandler->top50OriginalWordsData;
+}
+int QueryProcessor::getTotalUniqueAuthors(){
+    return this->indexHandler->totalUniqueAuthors;
+}
+unsigned int QueryProcessor::getTotalWordsIndexed(){
+    return this->indexHandler->totalWordsIndexed;
+}
+unsigned int QueryProcessor::getAvgWordsIndexedPerArticle(){
+    return this->indexHandler->avgWordsIndexedPerArticle;
+}
+unsigned int QueryProcessor::getTotalArticlesIndexed(){
+    return this->indexHandler->totalArticlesIndexed;
 }

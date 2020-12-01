@@ -11,6 +11,10 @@ IndexHandler::IndexHandler(const string &corpusPath){
     this->authorIndex = nullptr;
 }
 
+bool IndexHandler::isIndexEmpty(){
+    return this->keyWordIndex == nullptr;
+}
+
 void IndexHandler::clearIndex() {
     if (this->keyWordIndex != nullptr) {
         delete this->keyWordIndex;
@@ -24,11 +28,12 @@ void IndexHandler::clearIndex() {
 
     this->totalArticlesIndexed = 0;
     this->avgWordsIndexedPerArticle = 0;
-    this->topStemmed50WordsData.clear();
-    this->top50OriginalWordsData.clear();
+    //this->topStemmed50WordsData.erase(this->topStemmed50WordsData.begin(), this->topStemmed50WordsData.end());
+    //this->top50OriginalWordsData.erase(this->top50OriginalWordsData.begin(), this->top50OriginalWordsData.end());
     this->totalWordsIndexed =  0;
     this->totalUniqueAuthors = 0;
 }
+
 
 int IndexHandler::createIndex(){
     this->clearIndex();
@@ -124,7 +129,7 @@ unordered_map<string, ArticleMetaData> IndexHandler::loadMetaData(const string &
             metaData.author = result[10];
             metaData.title = result[3];
             metaData.abstract = result[8];
-            metaData.publicationDOI = result[4];
+            metaData.publication = result[11];
 
             metaDataMap[result[1]] = metaData;
         }

@@ -22,6 +22,8 @@ public:
 
     void clearIndex();
 
+    bool isIndexEmpty();
+
     unordered_map<string, ArticleMetaData> metaDataMap;
 
     int maxFilesToLoad = -1;
@@ -29,11 +31,9 @@ public:
     unsigned int avgWordsIndexedPerArticle = 0;
     unsigned int totalWordsIndexed = 0;
     int totalUniqueAuthors = 0;
-    std::vector<string> topStemmed50Words;
-    std::vector<string> top50OriginalWords;
     std::vector<std::pair<int,string>> topStemmed50WordsData;
     std::vector<std::pair<int,string>> top50OriginalWordsData;
-private:
+//private:
     DSAvlTree<IndexNodeData>* keyWordIndex;
     DSHashTable<string, unordered_set<string>> *authorIndex;
 

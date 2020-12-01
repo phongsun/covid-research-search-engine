@@ -17,7 +17,18 @@ public:
     bool operator== (const IndexNodeData& rhs) const;
     bool operator< (const IndexNodeData& rhs) const;
     bool operator> (const IndexNodeData& rhs) const;
+
     string toJsonString() const; // convert the object to a json string to serialize
+
+    // IDF(t) = log_e(Total number of documents / Number of documents with term t in it).
+    void calculateIdf(unsigned int totalArticlesIndexed);
+
+    // overloading << for ostream
+    // this is used by AvlTree.serialize() to save json representation to the output stream
+    friend ostream& operator<<(ostream& os, const IndexNodeData& nodeData) {
+        os << nodeData.toJsonString();
+        return os;
+    }
 
     string keyWord;
     unordered_map<string, unsigned int> invertedWordFreq;
@@ -29,8 +40,6 @@ public:
     // by computing the following:
     double idf;
 
-    // IDF(t) = log_e(Total number of documents / Number of documents with term t in it).
-    void calculateIdf(unsigned int totalArticlesIndexed);
 };
 
 

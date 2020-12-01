@@ -12,18 +12,26 @@
 
 class SearchEngineUI {
 public:
-    SearchEngineUI(QueryProcessor *queryProcessor);
+    SearchEngineUI(QueryProcessor *input);
+
+    void run();
+
+    void displayMainMenu(int &mainMenuChoice);
+
+    void clearScreen();
+
     // option 1
     void clearIndex();
 
     // option 2
-    void parseCorpus(DSAvlTree<IndexNodeData> &keywordIndex, string corpusDir);
+    void parseCorpus();
 
     // option 3
     void openPersistenceFile();
 
     // option 4
-    void searchByKeyword(const string &queryString);
+    void search();
+    void displayAbstract(const QueryResultData &resultData);
 
     // option 5
     void printStatistics();
