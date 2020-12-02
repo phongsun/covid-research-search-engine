@@ -19,7 +19,8 @@ class QueryProcessor {
 public:
     QueryProcessor(IndexHandler *indexHandler);
     void clearIndex();
-    unsigned int createIndex();
+    bool createIndex();
+    bool loadIndices(const string &dir = "");
     set<QueryResultData> search(string logicOp, vector<string> searchWords, vector<string> excludedWords, vector<string> authors);
     vector<string>* parseQueryString(const string &queryString);
 

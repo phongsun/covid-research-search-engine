@@ -36,7 +36,7 @@ void SearchEngineUI::run(){
         } else if (mainMenuChoice == 2) { // create the index
             parseCorpus();
         } else if (mainMenuChoice == 3) {
-            cout << "TO BE IMPLEMENTED!!!" << endl << endl;
+            openPersistenceFile();
         } else if (mainMenuChoice == 4) {
             search();
 
@@ -121,10 +121,68 @@ void SearchEngineUI::parseCorpus(){
     }
 }
 
+void SearchEngineUI::openPersistenceFile(){
+    string dir;
+    bool openFile = true;
+    if(!this->queryProcessor->isIndexEmpty()){ // if index is not empty warn user
+        bool openFile = false;
+        bool isChosen = false;
+        char choice;
+        // loop is for if the user chooses an invalid choice
+        while(isChosen == false){
+            cout << "Current index will be overwriten. Continue? (y/n)";
+            cin >> choice;
+            cout << endl;
+            if(choice == 'y'){
+                clearIndex();
+                openFile = true;
+                isChosen = true;
+            }else if(choice == 'n'){
+                cout << "Understandable. Have a nice day." << endl;
+                this->clearScreen();
+            }else{
+                cout << "Please choose a valid choice!" << endl;
+            }
+        }
+    }
+
+    if(openFile == true){
+        // ask user if they want to use default directory or custom
+        cout << "Do you want to use 1) the default directory or 2) a different directory? ";
+        int choice;
+        bool isChosen = false;
+        cin >> choice;
+        cout << endl;
+
+        // good ol' invalid choice loop
+        while(isChosen == false) {
+            if (choice == 1) {
+                dir = "../persistence";
+                isChosen = true;
+            } else if (choice == 2) {
+                cout << "Enter what directory you would like to use.";
+                string dirPart;
+                cin >> dirPart;
+                dir = "../" + dirPart;
+                isChosen = true;
+            } else{
+                cout << "Please enter a valid choice!" << endl;
+            }
+        }
+
+        this->queryProcessor->loadIndices(dir);
+        cout << "File loaded! Here are the stats." << endl;
+        printStatistics();
+
+    }
+}
+
 void SearchEngineUI::search(){
+    cin.ignore();
     string keyword;
     cout << "Enter your search term: ";
-    cin >> keyword;
+    getline(cin, keyword, '\n');
+    cout << endl;
     vector<string>* parsedQuery = this->queryProcessor->parseQueryString(keyword);
     set<QueryResultData> searchResults = this->queryProcessor->search(
                                          parsedQuery[this->queryProcessor->OP][0],
@@ -135,7 +193,7 @@ void SearchEngineUI::search(){
         cout << "Not found. Please enter a different search phrase." << endl;
     }else{
         while(true) {
-            cout << "Found " << searchResults.size() << " articles." << endl;
+            //cout << "Found " << searchResults.size() << " articles." << endl;
             if (searchResults.size() > 15) {
                 cout << "Top 15 results: " << endl;
             }
@@ -150,11 +208,13 @@ void SearchEngineUI::search(){
                     break;
                 }
             }
-            cout << "Which search result would you like to see the abstract for? (1-15)" << endl;
+            cout << endl << "Found " << searchResults.size() << " articles." << endl;
+            cout << endl << "Which search result would you like to see the abstract for? (1-15)" << endl;
             cout << "Or do you want to exit to the main menu? (0)" << endl;
             int abstractOrQuit;
             cout << "Enter your choice here: ";
             cin >> abstractOrQuit;
+            clearScreen();
             if (abstractOrQuit >= 1 && abstractOrQuit <= 15) {
                 abstractOrQuit--;
                 displayAbstract(*(next(searchResults.begin(), abstractOrQuit)));
@@ -186,7 +246,9 @@ void SearchEngineUI::displayAbstract(const QueryResultData &d){
 
 void SearchEngineUI::printStatistics() {
     if (this->queryProcessor->isIndexEmpty()) {
-        cout << "Index is empty. Please select choice 2 and then come back." << endl;
+        cout << "Index is empty. Please select choice 2 or 3 and then come back. Press any key then enter to go back to the main menu." << endl;
+        string pause;
+        cin >> pause;
     } else {
         cout << "=======================" << endl;
         cout << "=======STATISTICS======" << endl;
@@ -196,10 +258,20 @@ void SearchEngineUI::printStatistics() {
              << endl;
         cout << "Total words indexed: " << this->queryProcessor->getTotalWordsIndexed() << endl;
         cout << "Total unique authors: " << this->queryProcessor->getTotalUniqueAuthors() << endl;
-        cout << "Top 50 most frequent words : ";
+        cout << "Top 50 most frequent words : " << endl;
+        int i = 1;
         for (auto top50OriginalWord: this->queryProcessor->getTop50OriginalWords()) {
-            cout << top50OriginalWord << ", ";
+            cout << i << ". " << top50OriginalWord;
+            if(i % 5 == 0){
+                cout << endl;
+            }else{
+                cout << ", ";
+            }
+            i++;
         }
         cout << endl << endl;
+        string pause;
+        cout << "Press any key then enter to go back.";
+        cin >> pause;
     }
 }

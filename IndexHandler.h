@@ -17,22 +17,21 @@ using namespace std;
 class IndexHandler {
 public:
     IndexHandler(const string &corpusPath);
-    int createIndex();
+    bool createIndex();
+    bool persistIndices();
+    bool restoreIndices(const string &dir = "");
+    IndexNodeData* searchByKeyword(const string &keyWord);
+    unordered_set<string> searchByAuthor(const string &author);
+    void clearIndex();
+    bool isIndexEmpty();
+
+
     bool persistKeywordIndex();
     bool restoreKeywordIndex();
     bool persistAuthorIndex();
     bool restoreAuthorIndex();
-    bool persistIndices();
-    bool restoreIndices();
     bool persistStats();
     bool restoreStats();
-
-    IndexNodeData* searchByKeyword(const string &keyWord);
-    unordered_set<string> searchByAuthor(const string &author);
-
-    void clearIndex();
-    bool isIndexEmpty();
-
     unordered_map<string, ArticleMetaData> metaDataMap;
 
 

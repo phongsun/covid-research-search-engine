@@ -12,9 +12,13 @@ void QueryProcessor::clearIndex(){
     this->indexHandler->clearIndex();
 }
 
-unsigned int QueryProcessor::createIndex(){
+bool QueryProcessor::createIndex(){
     // create keywords and author indices and persist them in file
     return this->indexHandler->createIndex() && this->indexHandler->persistIndices();
+}
+
+bool QueryProcessor::loadIndices(const string &dir){
+    return this->indexHandler->restoreIndices(dir);
 }
 
 inline void QueryProcessor::searchKeywordIndex(const vector<string> &searchWords,

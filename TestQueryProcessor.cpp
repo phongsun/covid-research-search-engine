@@ -133,6 +133,8 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         ih->createIndex();
 
         string queryString = "AND cell covid patients inflame Pediatric";
+        //string queryString;
+        //getline(cin, queryString, '\n');
         QueryProcessor *qP = new QueryProcessor(ih);
         vector<string>* parsedQuery = qP->parseQueryString(queryString);
         set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
@@ -167,7 +169,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         REQUIRE(searchResults.size() == 71);
 
         for (auto r: searchResults) {
-            cout << r.weight << " |" << r.datePublished << " |" << r.publication << endl;
+            //cout << r.weight << " |" << r.datePublished << " |" << r.publication << endl;
         }
         delete qP;
     }

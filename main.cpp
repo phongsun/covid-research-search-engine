@@ -8,7 +8,7 @@
 #include "IndexHandler.h"
 #include "QueryProcessor.h"
 
-#define TEST_ONLY true;
+//#define TEST_ONLY true;
 
 using namespace std;
 

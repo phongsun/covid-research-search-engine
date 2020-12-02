@@ -35,7 +35,7 @@ void IndexHandler::clearIndex() {
     this->totalUniqueAuthors = 0;
 }
 
-int IndexHandler::createIndex(){
+bool IndexHandler::createIndex(){
     this->clearIndex();
 
     DocumentParser documentParser = DocumentParser(this->corpusPath, this->stopWordFile, this->metaDataMap);
@@ -55,7 +55,7 @@ int IndexHandler::createIndex(){
     this->totalUniqueAuthors = documentParser.totalUniqueAuthors;
     this->totalWordsIndexed =  this->keyWordIndex->count();
 
-    return this->totalWordsIndexed;
+    return this->totalWordsIndexed > 0;
 }
 
 IndexNodeData* IndexHandler::searchByKeyword(const string &keyWord){
@@ -104,7 +104,10 @@ bool IndexHandler::persistIndices(){
     }
 }
 
-bool IndexHandler::restoreIndices() {
+bool IndexHandler::restoreIndices(const string &dir) {
+    if(dir.length() > 0){
+        this->setPersistentDir(dir);
+    }
     // clear the index
     this->clearIndex();
 
