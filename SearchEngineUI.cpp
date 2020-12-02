@@ -201,9 +201,39 @@ void SearchEngineUI::search(){
             for (auto d : searchResults) {
                 i++;
                 cout << i << ". " << d.title << endl;
-                cout << "Published at " << d.publication;
-                cout << "Published on " << d.datePublished;
-                cout << "Published by " << d.authorString << endl;
+                string publication;
+                if (d.publication.length() == 0) {
+                    publication = "unknown publication";
+                } else {
+                    publication = d.publication;
+                }
+                string authorString = d.authorString;
+                int sepPos = authorString.find(",");
+                // authors are not sperated by ;, then find the 2 space as the separator of authors
+                if (sepPos == string::npos){
+                    sepPos = 0;
+                    int spc = 0;
+                    for (; sepPos < authorString.length(); sepPos++) {
+                        if (authorString[sepPos] == ' ') {
+                            spc++;
+                        }
+                        if (spc == 2) {
+                            break;
+                        }
+                    }
+                }
+                authorString = authorString[0] == '"' ? authorString.substr(1, sepPos - 1)
+                                                    : authorString.substr(0, sepPos - 1);
+                if (parsedQuery[this->queryProcessor->AUTHOR].size() > 0) {
+                    authorString = parsedQuery[this->queryProcessor->AUTHOR][0];
+                    authorString[0] = toupper(authorString[0]);
+                }
+                authorString += " et al., ";
+                cout <<  publication;
+
+                cout << ". " << authorString;
+                cout << d.datePublished << endl << endl;
+
                 if (i == 15) {
                     break;
                 }

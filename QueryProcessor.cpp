@@ -120,8 +120,8 @@ inline void QueryProcessor::buildQueryResult(const vector<IndexNodeData*> &searc
 
 set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searchWords, vector<string> excludedWords, vector<string> authors){
     set<QueryResultData> queryResultSet;
-    // trailing NOT operator cannot stand alone without keywords or authors
-    if(searchWords.size() == 0 && authors.size() == 0){
+    // logicOp cannot be empty. trailing NOT operator cannot stand alone without keywords or authors
+    if(logicOp.length() == 0 || (searchWords.size() == 0 && authors.size() == 0)){
         return queryResultSet;
     }
 
@@ -275,6 +275,7 @@ vector<string>* QueryProcessor::parseQueryString(const string &queryString){
         op = "NONE";
         keywordsPos = 0;
     }
+
     logicOp.push_back(op);
     notPos = notPos == string::npos ? queryString.length() : notPos;
     authorsPos = authorsPos == string::npos ? notPos : authorsPos;

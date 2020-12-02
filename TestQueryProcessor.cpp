@@ -155,6 +155,30 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         delete qP;
     }
 
+    SECTION("Illegal search phrase"){
+        IndexHandler *ih = new IndexHandler("../test_data");
+        // load files into the index
+        ih->createIndex();
+
+        string queryString = "";
+        QueryProcessor *qP = new QueryProcessor(ih);
+        vector<string>* parsedQuery = qP->parseQueryString(queryString);
+        set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 0);
+
+        queryString = "AUTHOR blha NOT me AND what ever";
+        parsedQuery = qP->parseQueryString(queryString);
+        searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 0);
+
+        queryString = "AUTHOR Period AND WHOr";
+        parsedQuery = qP->parseQueryString(queryString);
+        searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 0);
+
+        delete qP;
+    }
+
     SECTION("Search single NOT"){
         IndexHandler *ih = new IndexHandler("../test_data");
         ih->createIndex();
