@@ -198,7 +198,7 @@ void SearchEngineUI::printStatistics() {
         cout << "Total unique authors: " << this->queryProcessor->getTotalUniqueAuthors() << endl;
         cout << "Top 50 most frequent words : ";
         for (auto top50OriginalWord: this->queryProcessor->getTop50OriginalWords()) {
-            cout << top50OriginalWord.second << ", ";
+            cout << top50OriginalWord << ", ";
         }
         cout << endl << endl;
     }

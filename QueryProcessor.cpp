@@ -13,7 +13,8 @@ void QueryProcessor::clearIndex(){
 }
 
 unsigned int QueryProcessor::createIndex(){
-    return this->indexHandler->createIndex();
+    // create keywords and author indices and persist them in file
+    return this->indexHandler->createIndex() && this->indexHandler->persistIndices();
 }
 
 inline void QueryProcessor::searchKeywordIndex(const vector<string> &searchWords,
@@ -299,8 +300,8 @@ bool QueryProcessor::isIndexEmpty(){
     return this->indexHandler->isIndexEmpty();
 }
 
-vector<pair<int, string>> QueryProcessor::getTop50OriginalWords(){
-    return this->indexHandler->top50OriginalWordsData;
+vector<string> QueryProcessor::getTop50OriginalWords(){
+    return this->indexHandler->topWords;
 }
 int QueryProcessor::getTotalUniqueAuthors(){
     return this->indexHandler->totalUniqueAuthors;

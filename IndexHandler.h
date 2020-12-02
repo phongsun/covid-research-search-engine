@@ -22,7 +22,10 @@ public:
     bool restoreKeywordIndex();
     bool persistAuthorIndex();
     bool restoreAuthorIndex();
-    bool restoreIndex();
+    bool persistIndices();
+    bool restoreIndices();
+    bool persistStats();
+    bool restoreStats();
 
     IndexNodeData* searchByKeyword(const string &keyWord);
     unordered_set<string> searchByAuthor(const string &author);
@@ -32,13 +35,14 @@ public:
 
     unordered_map<string, ArticleMetaData> metaDataMap;
 
-    int maxFilesToLoad = -1;
+
     unsigned int totalArticlesIndexed = 0;
     unsigned int avgWordsIndexedPerArticle = 0;
     unsigned int totalWordsIndexed = 0;
     int totalUniqueAuthors = 0;
-    std::vector<std::pair<int,string>> topStemmed50WordsData;
-    std::vector<std::pair<int,string>> top50OriginalWordsData;
+    std::vector<std::pair<int,string>> topStemmed50Words;
+    std::vector<std::pair<int,string>> top50OriginalWords;
+    vector<string> topWords;
 
     unordered_map<string, ArticleMetaData> loadMetaData(const string &corpusPath);
 
@@ -48,13 +52,14 @@ public:
     string getPersistentDir() { return this->persistentDir; }
     string getKeyWordIndexFilePath() { return this->persistentDir + "/" + this->keyWordIndexFile; }
     string getAuthorIndexFilePath() { return this->persistentDir + "/" + this->authorIndexFile; }
-
+    string getStatsFilePath() { return this->persistentDir + "/" + this->statsFile; }
 private:
+    int maxFilesToLoad = -1; // use for debugging
     string persistentDir = "../persistence";
     const string stopWordFile = "./stop_words.txt";
     const string keyWordIndexFile = "keyword_index.json";
     const string authorIndexFile = "author_index.json";
-
+    const string statsFile = "stats.json";
     string corpusPath;
     DSAvlTree<IndexNodeData>* keyWordIndex;
     DSHashTable<string, unordered_set<string>> *authorIndex;

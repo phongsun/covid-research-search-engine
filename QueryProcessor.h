@@ -41,7 +41,7 @@ public:
 
     bool isIndexEmpty();
 
-    vector<pair<int, string>> getTop50OriginalWords();
+    vector<string> getTop50OriginalWords();
     int getTotalUniqueAuthors();
     unsigned int getTotalWordsIndexed();
     unsigned int getAvgWordsIndexedPerArticle();
