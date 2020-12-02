@@ -121,8 +121,18 @@ inline void QueryProcessor::buildQueryResult(const vector<IndexNodeData*> &searc
 set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searchWords, vector<string> excludedWords, vector<string> authors){
     set<QueryResultData> queryResultSet;
     // trailing NOT operator cannot stand alone without keywords or authors
-    if(searchWords.size() == 0 && authors.size() == 0 && excludedWords.size() > 0){
+    if(searchWords.size() == 0 && authors.size() == 0){
         return queryResultSet;
+    }
+
+    if(searchWords.size() > 5){
+        searchWords.erase(searchWords.begin() + 5, searchWords.end());
+    }
+    if(authors.size() > 5){
+        authors.erase(authors.begin() + 5, authors.end());
+    }
+    if(excludedWords.size() > 5){
+        excludedWords.erase(excludedWords.begin() + 5, excludedWords.end());
     }
 
     // declare an array of search results corresponding to the keywords
@@ -194,12 +204,35 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
     }
 
     else if(logicOp.compare("OR") == 0){
+        vector<set<string>> tmpUnionList;
 
         // union the documentID from the searchResults array
         if(documentIDSets.size() > 1) {
-            set_union(documentIDSets[0].begin(), documentIDSets[0].end(), documentIDSets[1].begin(), documentIDSets[1].end(), inserter(unionResult, unionResult.begin()));
+            //set_union(documentIDSets[0].begin(), documentIDSets[0].end(), documentIDSets[1].begin(), documentIDSets[1].end(), inserter(unionResult, unionResult.begin()));
+            set<string> tmp00;
+            set_union(documentIDSets[0].begin(),
+                    documentIDSets[0].end(),
+                    documentIDSets[1].begin(),
+                    documentIDSets[1].end(),
+                    inserter(tmp00, tmp00.begin()));
+            tmpUnionList.push_back(tmp00);
+            for(int i = 2; i < documentIDSets.size(); i++){
+                set<string> prevUnion = *(tmpUnionList.end() - 1);//last element of the vector
+                set<string> curUnion;
+                set_union(documentIDSets[i].begin(),
+                        documentIDSets[i].end(),
+                        prevUnion.begin(),
+                          prevUnion.end(), inserter(curUnion, curUnion.begin()));
+                tmpUnionList.push_back(curUnion);
+            }
+            unionResult = *(tmpUnionList.end() - 1);
+
         } else {
             unionResult = documentIDSets[0];
+        }
+
+        if (unionResult.size() == 0){
+            return queryResultSet;
         }
         /*for(int i = 2; i < documentIDSets.size(); i++){
             set_intersection(documentIDSets[i].begin(), documentIDSets[i].end(), documentIDSets.begin(), documentIDSets.end(), inserter(intersectionResult, intersectionResult.begin()));

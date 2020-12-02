@@ -239,6 +239,10 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         parsedQuery = qP->parseQueryString("OR cell congestion AUTHOR wang");
         searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
         REQUIRE(searchResults.size() == 12);
+
+        parsedQuery = qP->parseQueryString("OR cell congestion covid");
+        searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
+        REQUIRE(searchResults.size() == 82);
         delete qP;
     }
 
