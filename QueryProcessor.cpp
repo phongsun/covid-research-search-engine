@@ -186,8 +186,11 @@ set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searc
         } else { // only one search result
             intersectionResult = documentIDSets[0];
         }
-
-
+        // for AND op, if intersectionResult is empty, it means there is no overlapping between the two sets
+        // therefore, no result
+        if (intersectionResult.size() == 0){
+            return queryResultSet;
+        }
     }
 
     else if(logicOp.compare("OR") == 0){

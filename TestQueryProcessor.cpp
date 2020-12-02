@@ -196,15 +196,15 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         // load files into the index
         ih->createIndex();
 
-        string queryString = "AND covid vaccine";
+        string queryString = "AND cell vaccine";
         QueryProcessor *qP = new QueryProcessor(ih);
         vector<string>* parsedQuery = qP->parseQueryString(queryString);
         set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
-        REQUIRE(searchResults.size() == 37);
+        REQUIRE(searchResults.size() == 22);
 
-        parsedQuery = qP->parseQueryString("AND covid vaccine NOT cell");
+        parsedQuery = qP->parseQueryString("AND cell vaccine NOT disease");
         searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
-        REQUIRE(searchResults.size() == 11);
+        REQUIRE(searchResults.size() == 2);
         delete qP;
     }
 
@@ -213,15 +213,15 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
         // load files into the index
         ih->createIndex();
 
-        string queryString = "AND covid vaccine";
+        string queryString = "AND covid congestion";
         QueryProcessor *qP = new QueryProcessor(ih);
         vector<string>* parsedQuery = qP->parseQueryString(queryString);
         set<QueryResultData> searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
-        REQUIRE(searchResults.size() == 37);
+        REQUIRE(searchResults.size() == 0);
 
-        parsedQuery = qP->parseQueryString("AND covid vaccine AUTHOR wang");
+        parsedQuery = qP->parseQueryString("AND cell vaccine AUTHOR wang");
         searchResults = qP->search(parsedQuery[qP->OP][0], parsedQuery[qP->KEYWORD], parsedQuery[qP->EXCLUSION], parsedQuery[qP->AUTHOR]);
-        REQUIRE(searchResults.size() == 4);
+        REQUIRE(searchResults.size() == 1);
         delete qP;
     }
 
