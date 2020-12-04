@@ -5,6 +5,7 @@ cmake-build-debug/
 corpus/
 design_documentation/
 persistence/
+corpus_index/
 
 # Prerequisites
 *.d

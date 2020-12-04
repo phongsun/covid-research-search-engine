@@ -9,10 +9,12 @@ QueryProcessor::QueryProcessor(IndexHandler *indexHandler){
 }
 
 void QueryProcessor::clearIndex(){
+    cout << "Clearing index. Please wait..." << endl;
     this->indexHandler->clearIndex();
 }
 
 bool QueryProcessor::createIndex(){
+    cout << "Creating index. Please wait..." << endl;
     // create keywords and author indices and persist them in file
     return this->indexHandler->createIndex() && this->indexHandler->persistIndices();
 }
@@ -121,7 +123,7 @@ inline void QueryProcessor::buildQueryResult(const vector<IndexNodeData*> &searc
 set<QueryResultData> QueryProcessor::search(string logicOp, vector<string> searchWords, vector<string> excludedWords, vector<string> authors){
     set<QueryResultData> queryResultSet;
     // logicOp cannot be empty. trailing NOT operator cannot stand alone without keywords or authors
-    if(logicOp.length() == 0 || (searchWords.size() == 0 && authors.size() == 0)){
+    if((searchWords.size() == 0 && authors.size() == 0) || (searchWords.size() == 0 && authors.size() != 0)){
         return queryResultSet;
     }
 

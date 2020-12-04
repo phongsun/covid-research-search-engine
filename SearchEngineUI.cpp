@@ -7,20 +7,29 @@
 using namespace std;
 
 SearchEngineUI::SearchEngineUI(QueryProcessor *input) {
+    clearScreen();
     this->queryProcessor = input;
 }
 
 void SearchEngineUI::displayMainMenu(int &mainMenuChoice){
-    this->clearScreen();
-    cout << "Welcome to the COVID-19 search engine!" << endl;
-    cout << "1) Clear the index" << endl;
-    cout << "2) Parse corpus" << endl;
-    cout << "3) Open existing index file" << endl;
-    cout << "4) Search for a keyword" << endl;
-    cout << "5) Print basic statistics" << endl;
-    cout << "6) Quit" << endl;
-    cout << "Enter choice here: " << endl;
-    cin >> mainMenuChoice;
+    while(true) {
+        clearScreen();
+        cout << "Welcome to the COVID-19 search engine!" << endl;
+        cout << "1) Clear the index" << endl;
+        cout << "2) Parse corpus" << endl;
+        cout << "3) Open existing index file" << endl;
+        cout << "4) Search for a keyword" << endl;
+        cout << "5) Print basic statistics" << endl;
+        cout << "6) Quit" << endl;
+        cout << "Enter choice here: " << endl;
+
+        char o = cin.get();
+        int c = o - '0';
+        if (c >= 1 && c <=6) {
+            mainMenuChoice = c;
+            break;
+        }
+    }
     cout << endl;
 }
 
@@ -38,9 +47,8 @@ void SearchEngineUI::run(){
         } else if (mainMenuChoice == 3) {
             openPersistenceFile();
         } else if (mainMenuChoice == 4) {
+            cin.ignore();
             search();
-
-
         } else if (mainMenuChoice == 5) {
             printStatistics();
         } else if (mainMenuChoice == 6) {
@@ -59,6 +67,7 @@ void SearchEngineUI::clearScreen(){
 }
 
 void SearchEngineUI::clearIndex() {
+    clearScreen();
     // if the index is already empty notify the user
     if(this->queryProcessor->isIndexEmpty()){
         cout << "Index is already clear. Press any key then enter to go back to the main menu." << endl;
@@ -71,6 +80,7 @@ void SearchEngineUI::clearIndex() {
             cout << "Are you sure you want to clear the index? (y/n)" << endl;
             cin >> choice;
             if (choice == 'y') {
+                clearScreen();
                 this->queryProcessor->clearIndex();
                 cout << "Index cleared!" << endl << endl;
                 choiceChosen = true;
@@ -86,7 +96,7 @@ void SearchEngineUI::clearIndex() {
 }
 
 void SearchEngineUI::parseCorpus(){
-    this->clearScreen();
+    clearScreen();
     bool createIndex = true;
     // if the index isn't empty then warn the user
     if(!this->queryProcessor->isIndexEmpty()){
@@ -115,17 +125,17 @@ void SearchEngineUI::parseCorpus(){
     if(createIndex == true){ // create the index
         int noOfKeywords = this->queryProcessor->createIndex();
         printStatistics();
-        cout << "Press 1 to continue." << endl;
-        int cont;
-        cin >> cont;
+        cout << endl;
+        //int cont;
+        //cin >> cont;
     }
 }
 
 void SearchEngineUI::openPersistenceFile(){
+    clearScreen();
     string dir;
     bool openFile = true;
     if(!this->queryProcessor->isIndexEmpty()){ // if index is not empty warn user
-        bool openFile = false;
         bool isChosen = false;
         char choice;
         // loop is for if the user chooses an invalid choice
@@ -139,7 +149,8 @@ void SearchEngineUI::openPersistenceFile(){
                 isChosen = true;
             }else if(choice == 'n'){
                 cout << "Understandable. Have a nice day." << endl;
-                this->clearScreen();
+                openFile = false;
+                isChosen = true;
             }else{
                 cout << "Please choose a valid choice!" << endl;
             }
@@ -147,15 +158,15 @@ void SearchEngineUI::openPersistenceFile(){
     }
 
     if(openFile == true){
-        // ask user if they want to use default directory or custom
-        cout << "Do you want to use 1) the default directory or 2) a different directory? ";
         int choice;
         bool isChosen = false;
-        cin >> choice;
-        cout << endl;
 
         // good ol' invalid choice loop
         while(isChosen == false) {
+            // ask user if they want to use default directory or custom
+            cout << "Do you want to use 1) the default directory or 2) a different directory? ";
+            cin >> choice;
+            cout << endl;
             if (choice == 1) {
                 dir = "../persistence";
                 isChosen = true;
@@ -173,13 +184,12 @@ void SearchEngineUI::openPersistenceFile(){
         this->queryProcessor->loadIndices(dir);
         cout << "File loaded! Here are the stats." << endl;
         printStatistics();
-
     }
 }
 
 void SearchEngineUI::search(){
-    cin.ignore();
     string keyword;
+    bool brokeOut = false;
     cout << "Enter your search term: ";
     getline(cin, keyword, '\n');
     cout << endl;
@@ -190,7 +200,10 @@ void SearchEngineUI::search(){
                                          parsedQuery[this->queryProcessor->EXCLUSION],
                                          parsedQuery[this->queryProcessor->AUTHOR]);
     if(searchResults.size() == 0){
-        cout << "Not found. Please enter a different search phrase." << endl;
+        cout << "Not found. Please enter a different search phrase. Type anything then enter to continue." << endl;
+        string pause;
+        getline(cin, pause, '\n');
+        search();
     }else{
         while(true) {
             //cout << "Found " << searchResults.size() << " articles." << endl;
@@ -241,42 +254,52 @@ void SearchEngineUI::search(){
             cout << endl << "Found " << searchResults.size() << " articles." << endl;
             cout << endl << "Which search result would you like to see the abstract for? (1-15)" << endl;
             cout << "Or do you want to exit to the main menu? (0)" << endl;
+            cout << "Or perhaps search again? (16)" << endl;
             int abstractOrQuit;
-            cout << "Enter your choice here: ";
-            cin >> abstractOrQuit;
-            clearScreen();
-            if (abstractOrQuit >= 1 && abstractOrQuit <= 15) {
-                abstractOrQuit--;
-                displayAbstract(*(next(searchResults.begin(), abstractOrQuit)));
-                cout << "Press q to go back to the main menu or press c to go back to the results" << endl;
-                char abstractChoice;
-                cin >> abstractChoice;
-                if(abstractChoice == 'c'){
-                    continue;
-                }else{
+                cout << "Enter your choice here: ";
+                cin >> abstractOrQuit;
+                if (abstractOrQuit >= 1 && abstractOrQuit <= 15) {
+                    abstractOrQuit--;
+                    displayAbstract(*(next(searchResults.begin(), abstractOrQuit)));
+                    cout << "Press q to go back to the main menu or press c to go back to the results" << endl;
+                    char abstractChoice;
+                    cin >> abstractChoice;
+                    if (abstractChoice == 'c') {
+                        continue;
+                    } else {
+                        break;
+                    }
+                } else if (abstractOrQuit == 0) {
+                    break;
+                } else if (abstractOrQuit == 16) {
+                    brokeOut = true;
                     break;
                 }
-            }else{
-                break;
-            }
         }
+    }
+
+    if(brokeOut == true){
+        cin.ignore();
+        search();
     }
 
 }
 
 void SearchEngineUI::displayAbstract(const QueryResultData &d){
+    clearScreen();
     cout <<  d.title << endl;
     cout << "Published at " << d.publication;
     cout << "Published on " << d.datePublished;
     cout << "Published by " << d.authorString << endl << endl;
     cout << d.abstract << endl;
-    cout << "Press any key to return to the menu." << endl;
 
 }
 
 void SearchEngineUI::printStatistics() {
+    clearScreen();
     if (this->queryProcessor->isIndexEmpty()) {
         cout << "Index is empty. Please select choice 2 or 3 and then come back. Press any key then enter to go back to the main menu." << endl;
+
         string pause;
         cin >> pause;
     } else {
@@ -303,5 +326,7 @@ void SearchEngineUI::printStatistics() {
         string pause;
         cout << "Press any key then enter to go back.";
         cin >> pause;
+
     }
+
 }
