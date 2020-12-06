@@ -133,7 +133,7 @@ TEST_CASE("IndexHandler", "IndexHandler") {
             // for the same author, all documents in the list should match
             unordered_set<string>::iterator docIter1 = el_1.second.begin(); // document id iterator
             unordered_set<string> docListX = (*tmpX).second; // document id list in restored index
-            unordered_set<string>::iterator docIterXEnd = (unordered_set<string>::iterator)((*tmpX).second.end());
+            unordered_set<string>::iterator docIterXEnd = docListX.end();
             while (docIter1 != el_1.second.end()) {
                 string docId1 = *docIter1; // doc ID in from original index
                 REQUIRE(docListX.find(docId1) != docIterXEnd); // should find it in restored index
