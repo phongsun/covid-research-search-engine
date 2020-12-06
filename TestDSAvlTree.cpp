@@ -104,7 +104,7 @@ TEST_CASE("DSAvlTree", "[DSAvlTree]"){
         delete testTree;
     }
 
-    SECTION( "Serialization" ) {
+    /*SECTION( "Serialization" ) {
         IndexHandler *ih = new IndexHandler("../test_data");
         // load files into the index
         ih->createIndex();
@@ -131,7 +131,7 @@ TEST_CASE("DSAvlTree", "[DSAvlTree]"){
         remove(ih->getKeyWordIndexFilePath().c_str());
 
         delete ih;
-    }
+    }*/
 
     SECTION( "Deserialization" ) {
         IndexHandler *ih_serialize = new IndexHandler("../test_data");
