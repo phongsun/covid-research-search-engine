@@ -3,6 +3,7 @@
 //
 
 #include "QueryResultData.h"
+#include <cstring>
 time_t QueryResultData::getPubDate() const {
     char dateArray[this->datePublished.size()];
     // copy datePublished string to the dateArrray
@@ -19,7 +20,7 @@ time_t QueryResultData::getPubDate() const {
         ltm->tm_sec = 1;
     } else if (this->datePublished.length() == 10){
         char *pch;
-        pch = strtok(dateArray, "-");
+        pch = std::strtok(dateArray, "-");
         ltm->tm_year = atoi(pch); // get year value
         ltm->tm_mon = atoi(strtok(NULL, "-")) - 1; // get month value, 0-11, so minus 1
         ltm->tm_mday = atoi(strtok(NULL, "-")); // get day value
