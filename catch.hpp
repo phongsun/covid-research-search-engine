@@ -5903,7 +5903,7 @@ namespace Catch {
             assert(!m_sectionStack.empty());
             // AssertionResult holds a pointer to a temporary DecomposedExpression,
             // which getExpandedExpression() calls to build the expression string.
-            // Our section stack copy of the assertionResult will likely outlive the
+            // Our section myStack copy of the assertionResult will likely outlive the
             // temporary, so it must be expanded or discarded now to avoid calling
             // a destroyed object later.
             prepareExpandedExpression(const_cast<AssertionResult&>( assertionStats.assertionResult ) );
@@ -7957,7 +7957,7 @@ namespace Catch {
 #elif defined(CATCH_PLATFORM_LINUX)
     // If we can use inline assembler, do it because this allows us to break
     // directly at the location of the failing check instead of breaking inside
-    // raise() called from it, i.e. one stack frame below.
+    // raise() called from it, i.e. one myStack frame below.
     #if defined(__GNUC__) && (defined(__i386) || defined(__x86_64))
         #define CATCH_TRAP() asm volatile ("int $3") /* NOLINT */
     #else // Fall back to the generic way.
@@ -8260,7 +8260,7 @@ namespace Catch {
         if( m_reaction.shouldDebugBreak ) {
 
             // If you find your debugger stopping you here then go one level up on the
-            // call-stack for the code that caused it (typically a failed assertion)
+            // call-myStack for the code that caused it (typically a failed assertion)
 
             // (To go back to the test and change execution, jump over the throw, next)
             CATCH_BREAK_INTO_DEBUGGER();
@@ -10784,7 +10784,7 @@ namespace Catch {
 
     FatalConditionHandler::FatalConditionHandler() {
         isSet = true;
-        // 32k seems enough for Catch to handle stack overflow,
+        // 32k seems enough for Catch to handle myStack overflow,
         // but the value was found experimentally, so there is no strong guarantee
         guaranteeSize = 32 * 1024;
         exceptionHandlerHandle = nullptr;
@@ -10822,7 +10822,7 @@ namespace Catch {
         const char* name;
     };
 
-    // 32kb for the alternate stack seems to be sufficient. However, this value
+    // 32kb for the alternate myStack seems to be sufficient. However, this value
     // is experimentally determined, so that's not guaranteed.
     static constexpr std::size_t sigStackSize = 32768 >= MINSIGSTKSZ ? 32768 : MINSIGSTKSZ;
 
@@ -10874,7 +10874,7 @@ namespace Catch {
             for( std::size_t i = 0; i < sizeof(signalDefs)/sizeof(SignalDefs); ++i ) {
                 sigaction(signalDefs[i].id, &oldSigActions[i], nullptr);
             }
-            // Return the old stack
+            // Return the old myStack
             sigaltstack(&oldSigStack, nullptr);
             isSet = false;
         }

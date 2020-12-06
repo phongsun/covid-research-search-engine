@@ -204,12 +204,12 @@ use a 64-bit target such as x64, 64-bit ARM or 64-bit PPC.")
 #endif
 #endif
 
-// workaround for large stack sizes under -O0.
+// workaround for large myStack sizes under -O0.
 // https://github.com/simdjson/simdjson/issues/691
 #ifdef __APPLE__
 #ifndef __OPTIMIZE__
-// Apple systems have small stack sizes in secondary threads.
-// Lack of compiler optimization may generate high stack usage.
+// Apple systems have small myStack sizes in secondary threads.
+// Lack of compiler optimization may generate high myStack usage.
 // Users may want to disable threads for safety, but only when
 // in debug mode which we detect by the fact that the __OPTIMIZE__
 // macro is not defined.

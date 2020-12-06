@@ -15,7 +15,7 @@ public:
         friend class DSAvlTree<T>; // allows access to private variables
 
         bool hasNext() {
-            if(stack.empty()) {
+            if(myStack.empty()) {
                 return false;
             } else {
                 return true;
@@ -27,10 +27,10 @@ public:
             if(!hasNext()){
                 return nullptr;
             }
-            DSAvlNode<T> *n = stack.top();
-            stack.pop();
-            if(n->left != nullptr) stack.push(n->left);
-            if(n->right != nullptr) stack.push(n->right);
+            DSAvlNode<T> *n = myStack.top();
+            myStack.pop();
+            if(n->left != nullptr) myStack.push(n->left);
+            if(n->right != nullptr) myStack.push(n->right);
 
             return  n;
         }
@@ -39,10 +39,10 @@ public:
         // private constructors for use by the DSAvlTree only
         Iterator(DSAvlTree<T> *t) {
             this->tree = t;
-            stack.push(tree->root);
+            myStack.push(tree->root);
         }
         DSAvlTree<T> *tree;
-        stack<DSAvlNode<T>*> stack;
+        stack<DSAvlNode<T>*> myStack;
 
     };
 
