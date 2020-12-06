@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <stack>
 #include "IndexNodeData.h"
 using namespace std;
 
