@@ -42,7 +42,7 @@ public:
             myStack.push(tree->root);
         }
         DSAvlTree<T> *tree;
-        stack<DSAvlNode<T>*> myStack;
+        std::stack<DSAvlNode<T>*> myStack;
 
     };
 
