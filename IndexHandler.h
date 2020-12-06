@@ -54,7 +54,7 @@ public:
     string getStatsFilePath() { return this->persistentDir + "/" + this->statsFile; }
 private:
     int maxFilesToLoad = -1; // use for debugging
-    string persistentDir = "../persistence";
+    string persistentDir = "./persistence";
     const string stopWordFile = "./stop_words.txt";
     const string keyWordIndexFile = "keyword_index.json";
     const string authorIndexFile = "author_index.json";

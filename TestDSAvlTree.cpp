@@ -105,17 +105,17 @@ TEST_CASE("DSAvlTree", "[DSAvlTree]"){
     }
 
     SECTION( "Serialization" ) {
-        int debugCnt = 0;
-        cout << "Makes it to " << debugCnt++ << endl;
-        IndexHandler *ih = new IndexHandler("../test_data");
-        cout << "Makes it to " << debugCnt++ << endl;
+        //int debugCnt = 0;
+        //cout << "Makes it to " << debugCnt++ << endl;
+        IndexHandler *ih = new IndexHandler("./test_data");
+        //cout << "Makes it to " << debugCnt++ << endl;
         // load files into the index
         ih->createIndex();
-        cout << "Makes it to " << debugCnt++ << endl;
+        //cout << "Makes it to " << debugCnt++ << endl;
         // save the tree to a file
-        /*ih->persistKeywordIndex();
+        ih->persistKeywordIndex();
 
-        cout << "Makes it to " << debugCnt++ << endl;
+        //cout << "Makes it to " << debugCnt++ << endl;
         // read line from the tree file
         string line;
         ifstream myfile;
@@ -135,18 +135,18 @@ TEST_CASE("DSAvlTree", "[DSAvlTree]"){
         REQUIRE(ih->totalWordsIndexed == cnt);
         remove(ih->getKeyWordIndexFilePath().c_str());
 
-        delete ih;*/
+        delete ih;
     }
 
     SECTION( "Deserialization" ) {
-        IndexHandler *ih_serialize = new IndexHandler("../test_data");
+        IndexHandler *ih_serialize = new IndexHandler("./test_data");
         // load files into the index
         ih_serialize->createIndex();
         // save serialized tree to the file
         ih_serialize->persistKeywordIndex();
 
         // restore tree from the file
-        IndexHandler *ih_deserialize = new IndexHandler("../test_data");
+        IndexHandler *ih_deserialize = new IndexHandler("./test_data");
         REQUIRE(ih_deserialize->isIndexEmpty() == true);
         ih_deserialize->restoreKeywordIndex();
 

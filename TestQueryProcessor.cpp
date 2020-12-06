@@ -107,7 +107,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
     }
 
     SECTION("Search with NONE"){
-        IndexHandler *ih = new IndexHandler("../test_data");
+        IndexHandler *ih = new IndexHandler("./test_data");
         ih->createIndex();
 
         /*cout << "------ " << ih->totalArticlesIndexed << endl;
@@ -128,7 +128,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
     }
 
     SECTION("Search with AND only"){
-        IndexHandler *ih = new IndexHandler("../test_data");
+        IndexHandler *ih = new IndexHandler("./test_data");
         // load files into the index
         ih->createIndex();
 
@@ -143,7 +143,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
     }
 
     SECTION("Search with OR only"){
-        IndexHandler *ih = new IndexHandler("../test_data");
+        IndexHandler *ih = new IndexHandler("./test_data");
         // load files into the index
         ih->createIndex();
 
@@ -156,7 +156,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
     }
 
     SECTION("Illegal search phrase"){
-        IndexHandler *ih = new IndexHandler("../test_data");
+        IndexHandler *ih = new IndexHandler("./test_data");
         // load files into the index
         ih->createIndex();
 
@@ -180,7 +180,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
     }
 
     SECTION("Search single NOT"){
-        IndexHandler *ih = new IndexHandler("../test_data");
+        IndexHandler *ih = new IndexHandler("./test_data");
         ih->createIndex();
 
         QueryProcessor *qP = new QueryProcessor(ih);
@@ -199,7 +199,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
     }
 
     SECTION("OR NOT"){
-        IndexHandler *ih = new IndexHandler("../test_data");
+        IndexHandler *ih = new IndexHandler("./test_data");
         // load files into the index
         ih->createIndex();
 
@@ -216,7 +216,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
     }
 
     SECTION("AND NOT"){
-        IndexHandler *ih = new IndexHandler("../test_data");
+        IndexHandler *ih = new IndexHandler("./test_data");
         // load files into the index
         ih->createIndex();
 
@@ -233,7 +233,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
     }
 
     SECTION("AND AUTHOR"){
-        IndexHandler *ih = new IndexHandler("../test_data");
+        IndexHandler *ih = new IndexHandler("./test_data");
         // load files into the index
         ih->createIndex();
 
@@ -250,7 +250,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
     }
 
     SECTION("OR AUTHOR"){
-        IndexHandler *ih = new IndexHandler("../test_data");
+        IndexHandler *ih = new IndexHandler("./test_data");
         // load files into the index
         ih->createIndex();
 
@@ -271,7 +271,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
     }
 
     SECTION("NONE AUTHOR"){
-        IndexHandler *ih = new IndexHandler("../test_data");
+        IndexHandler *ih = new IndexHandler("./test_data");
         ih->createIndex();
 
         QueryProcessor *qP = new QueryProcessor(ih);
@@ -286,7 +286,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
     }
 
     SECTION("NONE AUTHOR NOT"){
-        IndexHandler *ih = new IndexHandler("../test_data");
+        IndexHandler *ih = new IndexHandler("./test_data");
         ih->createIndex();
 
         QueryProcessor *qP = new QueryProcessor(ih);
@@ -305,7 +305,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
     }
 
     SECTION("AND AUTHOR NOT"){
-        IndexHandler *ih = new IndexHandler("../test_data");
+        IndexHandler *ih = new IndexHandler("./test_data");
         ih->createIndex();
 
         QueryProcessor *qP = new QueryProcessor(ih);
@@ -324,7 +324,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
     }
 
     SECTION("OR AUTHOR NOT"){
-        IndexHandler *ih = new IndexHandler("../test_data");
+        IndexHandler *ih = new IndexHandler("./test_data");
         ih->createIndex();
 
         QueryProcessor *qP = new QueryProcessor(ih);
@@ -343,7 +343,7 @@ TEST_CASE("QueryProcessor", "QueryProcessor"){
     }
 
     /*SECTION("AUTHOR NOT"){
-        IndexHandler *ih = new IndexHandler("../test_data");
+        IndexHandler *ih = new IndexHandler("./test_data");
         ih->createIndex();
 
         QueryProcessor *qP = new QueryProcessor(ih);

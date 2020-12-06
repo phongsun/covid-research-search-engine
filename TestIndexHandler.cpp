@@ -11,7 +11,7 @@ using namespace std;
 
 TEST_CASE("IndexHandler", "IndexHandler") {
     SECTION("Create Keyword Index") {
-        string corpusDir = "../test_data";
+        string corpusDir = "./test_data";
 
         IndexHandler *ih = new IndexHandler(corpusDir);
         ih->createIndex();
@@ -47,7 +47,7 @@ TEST_CASE("IndexHandler", "IndexHandler") {
 
     SECTION("Clear Keyword Index") {
 
-        IndexHandler *ih = new IndexHandler("../test_data");
+        IndexHandler *ih = new IndexHandler("./test_data");
         ih->createIndex();
         REQUIRE(ih->totalArticlesIndexed == 100);
         REQUIRE(ih->avgWordsIndexedPerArticle == 594);
@@ -74,7 +74,7 @@ TEST_CASE("IndexHandler", "IndexHandler") {
     }
 
     SECTION("Search Author Index") {
-        IndexHandler *ih = new IndexHandler("../test_data");
+        IndexHandler *ih = new IndexHandler("./test_data");
         ih->createIndex();
 
         unordered_set<string> documentIds = ih->searchByAuthor("wang");
@@ -83,7 +83,7 @@ TEST_CASE("IndexHandler", "IndexHandler") {
     }
 
     SECTION("Serialize and Deserailize Stats") {
-        IndexHandler *ih1 = new IndexHandler("../test_data");
+        IndexHandler *ih1 = new IndexHandler("./test_data");
         ih1->createIndex();
         REQUIRE(ih1->persistStats() == true);
         REQUIRE(ih1->totalArticlesIndexed == 100);
@@ -94,7 +94,7 @@ TEST_CASE("IndexHandler", "IndexHandler") {
         REQUIRE(ih1->topWords[0].compare("cells") == 0);
         REQUIRE(ih1->topWords[49].compare("including") == 0);
 
-        IndexHandler *ihX = new IndexHandler("../test_data");
+        IndexHandler *ihX = new IndexHandler("./test_data");
         ihX->clearIndex();
         REQUIRE(ihX->restoreStats() == true);
         REQUIRE(ihX->totalArticlesIndexed == 100);
@@ -114,13 +114,13 @@ TEST_CASE("IndexHandler", "IndexHandler") {
 
     SECTION("Serialize and Deserailize Author Index") {
 
-        IndexHandler *ih1 = new IndexHandler("../test_data");
+        IndexHandler *ih1 = new IndexHandler("./test_data");
         ih1->createIndex();
         REQUIRE(ih1->persistAuthorIndex() == true);
         DSHashTable<string, unordered_set<string>> *author1 = ih1->authorX();
         DSHashTable<string, unordered_set<string>>::Iterator iter1 = author1->begin();
 
-        IndexHandler *ihX = new IndexHandler("../test_data");
+        IndexHandler *ihX = new IndexHandler("./test_data");
         ihX->clearIndex();
         REQUIRE(ihX->restoreAuthorIndex() == true);
         DSHashTable<string, unordered_set<string>> *authorX = ihX->authorX();
