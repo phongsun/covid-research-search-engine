@@ -4,7 +4,6 @@ cmake-build-debug/
 .idea/
 corpus/
 design_documentation/
-persistence/
 corpus_index/
 
 # Prerequisites
