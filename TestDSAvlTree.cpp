@@ -104,13 +104,18 @@ TEST_CASE("DSAvlTree", "[DSAvlTree]"){
         delete testTree;
     }
 
-    /*SECTION( "Serialization" ) {
+    SECTION( "Serialization" ) {
+        int debugCnt = 0;
+        cout << "Makes it to " << debugCnt++ << endl;
         IndexHandler *ih = new IndexHandler("../test_data");
+        cout << "Makes it to " << debugCnt++ << endl;
         // load files into the index
         ih->createIndex();
+        cout << "Makes it to " << debugCnt++ << endl;
         // save the tree to a file
         ih->persistKeywordIndex();
 
+        cout << "Makes it to " << debugCnt++ << endl;
         // read line from the tree file
         string line;
         ifstream myfile;
@@ -131,7 +136,7 @@ TEST_CASE("DSAvlTree", "[DSAvlTree]"){
         remove(ih->getKeyWordIndexFilePath().c_str());
 
         delete ih;
-    }*/
+    }
 
     SECTION( "Deserialization" ) {
         IndexHandler *ih_serialize = new IndexHandler("../test_data");
