@@ -43,7 +43,9 @@ public:
         simdjson::dom::element doc = jsonParser.parse(s);
         string objectTag = "o";
         string wordTag = "w";
-        data.keyWord = doc[objectTag][wordTag];
+        string_view keyword_v = doc[objectTag][wordTag].get_string();
+        string keyword_s = {keyword_v.begin(), keyword_v.end()};
+        data.keyWord = keyword_s;
         for(auto wordCount : doc["o"]["c"]){
             string_view k_v = wordCount["k"].get_string();
             string k = {k_v.begin(), k_v.end()};
