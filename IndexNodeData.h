@@ -41,7 +41,9 @@ public:
         // and populate data output parameter which is a type of IndexNodeData
         simdjson::dom::parser jsonParser;
         simdjson::dom::element doc = jsonParser.parse(s);
-        data.keyWord = doc["o"]["w"];
+        string objectTag = "o";
+        string wordTag = "w";
+        data.keyWord = doc[objectTag][wordTag];
         for(auto wordCount : doc["o"]["c"]){
             string_view k_v = wordCount["k"].get_string();
             string k = {k_v.begin(), k_v.end()};
