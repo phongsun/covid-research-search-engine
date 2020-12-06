@@ -37,11 +37,6 @@ TEST_CASE("IndexHandler", "IndexHandler") {
         REQUIRE(ih->topWords.size() == 50);
         REQUIRE(ih->topWords[0].compare("cells") == 0);
         REQUIRE(ih->topWords[49].compare("including") == 0);
-        REQUIRE(ih->topStemmed50Words.size() == 50);
-        REQUIRE(ih->topStemmed50Words[0].second.compare("cell (cells cell ) ") == 0);
-        REQUIRE(ih->topStemmed50Words[49].second.compare(
-                "perform (performed performing performance perform performs performances performer ) ") == 0);
-
         delete ih;
     }
 
@@ -56,11 +51,6 @@ TEST_CASE("IndexHandler", "IndexHandler") {
         REQUIRE(ih->top50OriginalWords.size() == 50);
         REQUIRE(ih->top50OriginalWords[0].second.compare("cells") == 0);
         REQUIRE(ih->top50OriginalWords[49].second.compare("including") == 0);
-        REQUIRE(ih->topStemmed50Words.size() == 50);
-        REQUIRE(ih->topStemmed50Words[0].second.compare("cell (cells cell ) ") == 0);
-        REQUIRE(ih->topStemmed50Words[49].second.compare(
-                "perform (performed performing performance perform performs performances performer ) ") == 0);
-
         ih->clearIndex();
 
         REQUIRE(ih->totalArticlesIndexed == 0);
@@ -68,7 +58,6 @@ TEST_CASE("IndexHandler", "IndexHandler") {
         REQUIRE(ih->totalWordsIndexed == 0);
         REQUIRE(ih->totalUniqueAuthors == 0);
         REQUIRE(ih->top50OriginalWords.size() == 0);
-        REQUIRE(ih->topStemmed50Words.size() == 0);
         delete ih;
 
     }
