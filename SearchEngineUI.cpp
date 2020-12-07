@@ -178,7 +178,7 @@ void SearchEngineUI::openPersistenceFile() {
                 dir = "../persistence";
                 isChosen = true;
             } else if (choice == 2) {
-                cout << "Enter what directory you would like to use.";
+                cout << "Enter what directory you would like to use: ";
                 string dirPart;
                 cin >> dirPart;
                 dir = "../" + dirPart;
@@ -209,10 +209,15 @@ void SearchEngineUI::search() {
             parsedQuery[this->queryProcessor->EXCLUSION],
             parsedQuery[this->queryProcessor->AUTHOR]);
     if (searchResults.size() == 0) {
-        cout << "Not found. Please enter a different search phrase. Type anything then enter to continue." << endl;
+        cout << "Not found." << endl;
         string pause;
+        if(!this->queryProcessor->isIndexEmpty()) {
+            cout << "Please enter a different search phrase. Type anything then enter to continue." << endl;
+        }
         getline(cin, pause, '\n');
-        search();
+        if(!this->queryProcessor->isIndexEmpty()) {
+            search();
+        }
     } else {
         while (true) {
             //cout << "Found " << searchResults.size() << " articles." << endl;
