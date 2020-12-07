@@ -213,6 +213,8 @@ void SearchEngineUI::search() {
         string pause;
         if(!this->queryProcessor->isIndexEmpty()) {
             cout << "Please enter a different search phrase. Type anything then enter to continue." << endl;
+        }else{
+            cout << "Please type any key then press enter to continue." << endl;
         }
         getline(cin, pause, '\n');
         if(!this->queryProcessor->isIndexEmpty()) {
